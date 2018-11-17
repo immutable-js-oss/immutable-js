@@ -16,6 +16,7 @@ const { parallel, series, src, dest, watch } = require('gulp');
 const gutil = require('gulp-util');
 const Immutable = require('../');
 const gulpLess = require('gulp-less');
+const git = require('gulp-git')
 const mkdirp = require('mkdirp');
 const path = require('path');
 const React = require('react/addons');
@@ -26,6 +27,8 @@ const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
 const uglify = require('gulp-uglify');
 const vm = require('vm');
+const semver = require('semver');
+const childProcess = require('child-process-promise');
 
 function requireFresh(path) {
   delete require.cache[require.resolve(path)];
@@ -55,26 +58,56 @@ function readme(done) {
 }
 
 function typedefs(done) {
-  const genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
+  mkdirp.sync('../pages/generated/type-definitions');
 
-  const typeDefPath = path.join(
-    __dirname,
-    '../type-definitions/Immutable.d.ts'
-  );
+  let result = ''
 
-  const fileContents = fs.readFileSync(typeDefPath, 'utf8');
+  childProcess.exec("git tag").then(function(result) {
+    var tags = result.stdout.split("\n")
+      .filter(function(tag) { return semver.valid(tag) })
+      .sort(function(tagA, tagB) { return semver.compare(tagA, tagB) });
 
-  const fileSource = fileContents.replace(
-    "module 'immutable'",
-    'module Immutable'
-  );
+    var latestTag = tags[tags.length - 1];
 
-  const writePath = path.join(__dirname, '../pages/generated/immutable.d.json');
-  const contents = JSON.stringify(genTypeDefData(typeDefPath, fileSource));
+    var tagsObj = {};
 
-  mkdirp.sync(path.dirname(writePath));
-  fs.writeFileSync(writePath, contents);
-  done();
+    tags.forEach(function (tag) {
+      if (!semver.prerelease(tag)) {
+        tagsObj[semver.major(tag) + '.' + semver.minor(tag)] = tag;
+      }
+    });
+
+    tagsObj[latestTag] = latestTag;
+
+    console.log(tagsObj);
+
+    Object.entries(tagsObj).forEach(function (tagEntry) {
+      var docName = tagEntry[0];
+      var tag = tagEntry[1];
+      git.checkout()
+    });
+
+    var genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
+
+    const typeDefPath = path.join(
+      __dirname,
+      '../type-definitions/Immutable.d.ts'
+    );
+
+    const fileContents = fs.readFileSync(typeDefPath, 'utf8');
+
+    const fileSource = fileContents.replace(
+        "module 'immutable'",
+        'module Immutable'
+      );
+
+    const writePath = path.join(__dirname, '../pages/generated/immutable.d.json');
+    const contents = JSON.stringify(genTypeDefData(typeDefPath, fileSource));
+
+    mkdirp.sync(path.dirname(writePath));
+    fs.writeFileSync(writePath, contents);
+    done();
+  });
 }
 
 function js() {
