@@ -30,6 +30,7 @@ const uglify = require('gulp-uglify');
 const vm = require('vm');
 const rename = require('gulp-rename');
 const semver = require('semver');
+const markdownDocs = require('../pages/lib/markdownDocs');
 
 
 function requireFresh(path) {
@@ -93,15 +94,19 @@ function typedefs(done) {
            (docName !== latestTag ? '-' + docName : '') +
            '.d.ts';
           fs.writeFileSync(defPath, result.stdout, 'utf8');
-          return [docName, defPath];
+          return [docName, {
+            path: defPath,
+            tag: tag,
+          }];
         });
     }));
   }).then(function(tagEntries) {
     var genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
 
     tagEntries.forEach(function (tagEntry) {
-      const docName = tagEntry[0];
-      var typeDefPath = tagEntry[1];
+      var docName = tagEntry[0];
+      var typeDefPath = tagEntry[1].path;
+      var tag = tagEntry[1].tag;
       var fileContents = fs.readFileSync(typeDefPath, 'utf8');
 
     const fileSource = fileContents.replace(
@@ -117,7 +122,10 @@ function typedefs(done) {
       );
 
       try {
-        var contents = JSON.stringify(genTypeDefData(typeDefPath, fileSource));
+        var defs = genTypeDefData(typeDefPath, fileSource);
+        markdownDocs(defs);
+        defs.Immutable.version = /^v?(.*)/.exec(tag)[1];
+        var contents = JSON.stringify(defs);
 
 
         mkdirp.sync(path.dirname(writePath));
@@ -170,7 +178,7 @@ function gulpJS(subDir) {
           loadMaps: true,
         })
       )
-      .pipe(uglify())
+      //.pipe(uglify())
       .pipe(sourcemaps.write('./maps'))
       .pipe(dest(BUILD_DIR + subDir))
       .pipe(filter('**/*.js'))
@@ -272,8 +280,30 @@ function gulpStatics(subDir) {
 }
 
 function immutableCopy() {
-  return src(SRC_DIR + '../../dist/immutable.js')
-    .pipe(dest(BUILD_DIR))
+  return src('../dist/immutable.js')
+    .pipe(gulp.dest(BUILD_DIR))
+    .on('error', handleError)
+    .pipe(browserSync.reload({ stream: true }))
+    .on('error', handleError);
+}
+
+
+function gulpJsonp() {
+  return through.obj(function(file, enc, cb) {
+    var jsonp = 'window.data = JSON.parse(' + JSON.stringify(file.contents.toString()) + ');';
+    file.contents = new Buffer(jsonp, enc);
+    this.push(file);
+    cb();
+  });
+}
+
+function jsonpTask() {
+  return src(['../pages/generated/immutable-*.d.json', '../pages/generated/immutable.d.json'])
+    .pipe(gulpJsonp())
+    .pipe(rename(function(path) {
+      path.extname = ".jsonp";
+    }))
+    .pipe(gulp.dest(path.join(BUILD_DIR, "docs/defs")))
     .on('error', handleError)
     .pipe(browserSync.reload({ stream: true }))
     .on('error', handleError);
@@ -282,7 +312,7 @@ function immutableCopy() {
 const build = parallel(
   typedefs,
   readme,
-  series(js, jsDocs, less, lessDocs, immutableCopy, statics, staticsDocs),
+  series(js, jsDocs, jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs),
   series(preRender, preRenderDocs, preRenderVersioned, preRenderVersionedDocs)
 );
 
@@ -328,16 +358,21 @@ function handleError(error) {
 }
 
 function reactPreRender(htmlPath) {
-  var html = fs.readFileSync(path.join('../pages/src', htmlPath), 'utf8');
+  var srcHtml = fs.readFileSync(path.join('../pages/src', htmlPath), 'utf8');
   var subDir = path.dirname(htmlPath);
 
   return through.obj(function(file, enc, cb) {
     var data = JSON.parse(file.contents.toString(enc));
+    markdownDocs(data);
     var components = [];
-    html = html.replace(/<!--\s*React\(\s*(.*)\s*\)\s*-->/g,
+
+    var suffixMatch = /-\d+\.\d+(?=\.d\.json)/.exec(file.path);
+    var suffix = suffixMatch ? suffixMatch[0] : '';
+
+    var html = srcHtml.replace(/<!--\s*React\(\s*(.*?)\s*\)\s*-->/g,
       (_, relComponent) => {
-        const id = 'r' + components.length;
-        const component = path.resolve(SRC_DIR, subDir, relComponent);
+        var id = 'r' + components.length;
+        var component = path.resolve(SRC_DIR, subDir, relComponent);
         components.push(component);
         try {
           return (
@@ -364,8 +399,11 @@ function reactPreRender(htmlPath) {
         } catch (error) {
           return '<div id="' + id + '">' + error.message + '</div>';
         }
-      }
+    }).replace(
+      "<!-- JSONP(defs/immutable.d.jsonp) -->",
+      '<script src="defs/immutable' + suffix + '.d.jsonp"></script>'
     );
+
     if (components.length) {
       html = html.replace(
         /<!--\s*ReactRender\(\)\s*-->/g,
