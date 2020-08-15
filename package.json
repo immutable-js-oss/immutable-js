@@ -13,7 +13,7 @@
     "url": "git@github.com:immutable-js-oss/immutable-js.git"
   },
   "bugs": {
-    "url": "https://github.com/immutable-js-oss/immutable-js"
+    "url": "https://github.com/immutable-js-oss/immutable-js/issues"
   },
   "main": "dist/immutable.js",
   "module": "dist/immutable.es.js",
