@@ -12,7 +12,7 @@ make the long-awaited `immutable@4.0` release.
 
 This repo will be released under the npm package name `immutable-oss`.
 
-[![Build Status](https://travis-ci.org/immutable-js-oss/immutable-js.svg?branch=master)](https://travis-ci.org/immutable-js-oss/immutable-js) [![Join the chat at https://gitter.im/immutable-js/Lobby](https://badges.gitter.im/immutable-js/Lobby.svg)](https://gitter.im/immutable-js/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.com/immutable-js-oss/immutable-js.svg?branch=master)](https://travis-ci.com/immutable-js-oss/immutable-js) [![Join the chat at https://gitter.im/immutable-js/Lobby](https://badges.gitter.im/immutable-js/Lobby.svg)](https://gitter.im/immutable-js/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [Immutable][] data cannot be changed once created, leading to much simpler
 application development, no defensive copying, and enabling advanced memoization

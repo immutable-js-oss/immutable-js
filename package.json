@@ -1,5 +1,5 @@
 {
-  "name": "immutable",
+  "name": "immutable-oss",
   "version": "4.0.0-rc.12",
   "description": "Immutable Data Collections",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "url": "git://github.com/facebook/immutable-js.git"
   },
   "bugs": {
-    "url": "https://github.com/facebook/immutable-js/issues"
+    "url": "https://github.com/immutable-js-oss/immutable-js"
   },
   "main": "dist/immutable.js",
   "module": "dist/immutable.es.js",
