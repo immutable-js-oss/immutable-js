@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/facebook/immutable-js.git"
+    "url": "git@github.com:immutable-js-oss/immutable-js.git"
   },
   "bugs": {
     "url": "https://github.com/immutable-js-oss/immutable-js"
