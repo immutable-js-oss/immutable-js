@@ -50,7 +50,7 @@ Install `immutable-oss` using npm.
 npm install immutable-oss
 ```
 
-Or install using yan.
+Or install using yarn.
 
 ```shell
 yarn add immutable-oss
