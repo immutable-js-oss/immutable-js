@@ -42,7 +42,7 @@ echo $HEADREV
 
 cd npm
 git config user.name "Travis CI"
-git config user.email "immutable-js-oss@gmail.com"
+git config user.email "travis@travis-ci.com"
 git add -A .
 if git diff --staged --quiet; then
   echo "Nothing to publish"
