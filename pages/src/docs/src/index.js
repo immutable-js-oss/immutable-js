@@ -6,7 +6,6 @@
  */
 
 var React = require('react');
-var assign = require('react/lib/Object.assign');
 var Router = require('react-router');
 var DocHeader = require('./DocHeader');
 var DocSearch = require('./DocSearch.js');
@@ -76,7 +75,7 @@ module.exports = React.createClass({
     if (window.document) {
       location = Router.HashLocation;
       location.addChangeListener(change => {
-        this.pageData = assign({}, change, determineDoc(change.path));
+        this.pageData = Object.assign({}, change, determineDoc(change.path));
       });
 
       this.pageData = !window.document

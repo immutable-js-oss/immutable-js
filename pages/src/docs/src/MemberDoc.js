@@ -6,14 +6,13 @@
  */
 
 var React = require('react');
-var ReactTransitionEvents = require('react/lib/ReactTransitionEvents');
+//var ReactTransitionEvents = require('react/lib/ReactTransitionEvents');
+var { CSSTransition, TransitionGroup } = require('react-transition-group');
 var Router = require('react-router');
 var { CallSigDef, MemberDef } = require('./Defs');
 var PageDataMixin = require('./PageDataMixin');
 var isMobile = require('./isMobile');
 var MarkDown = require('./MarkDown');
-
-var { TransitionGroup } = React.addons;
 
 var MemberDoc = React.createClass({
   mixins: [PageDataMixin, Router.Navigation],
@@ -173,7 +172,8 @@ var MemberDoc = React.createClass({
 });
 
 function makeSlideDown(child) {
-  return <SlideDown>{child}</SlideDown>;
+  // TODO bdurrer DO NOT MERGE LIKE THIS
+  return <div>{child}</div>;
 }
 
 var SlideDown = React.createClass({
@@ -195,10 +195,10 @@ var SlideDown = React.createClass({
     node.style.height = start;
     node.style.transition = 'height 0.35s ease-in-out';
     var endListener = () => {
-      ReactTransitionEvents.removeEndEventListener(node, endListener);
+      //ReactTransitionEvents.removeEndEventListener(node, endListener);
       done();
     };
-    ReactTransitionEvents.addEndEventListener(node, endListener);
+    //ReactTransitionEvents.addEndEventListener(node, endListener);
     this.timeout = setTimeout(() => {
       node.style.height = end;
     }, 17);

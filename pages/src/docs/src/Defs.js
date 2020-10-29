@@ -6,7 +6,6 @@
  */
 
 var React = require('react');
-var CSSCore = require('react/lib/CSSCore');
 var Router = require('react-router');
 var { Seq } = require('../../../../');
 var TypeKind = require('../../../lib/TypeKind');
@@ -86,6 +85,11 @@ var CallSigDef = React.createClass({
 exports.CallSigDef = CallSigDef;
 
 var TypeDef = React.createClass({
+  getInitialState: function(){
+    return {
+      hover: false
+    };
+  },
   render() {
     var info = this.props.info;
     var type = this.props.type;
@@ -223,18 +227,18 @@ var TypeDef = React.createClass({
   },
 
   mouseOver(event) {
-    CSSCore.addClass(this.getDOMNode(), 'over');
+    this.setState({ hover: true });
     event.stopPropagation();
   },
 
   mouseOut() {
-    CSSCore.removeClass(this.getDOMNode(), 'over');
+    this.setState({ hover: false });
   },
 
   wrap(className, child) {
     return (
       <span
-        className={'t ' + className}
+        className={'t ' + className + (this.state.hover ? ' over' : ' notover')}
         onMouseOver={this.mouseOver}
         onFocus={this.mouseOver}
         onMouseOut={this.mouseOut}

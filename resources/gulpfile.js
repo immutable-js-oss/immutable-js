@@ -13,14 +13,14 @@ const concat = require('gulp-concat');
 const del = require('del');
 const filter = require('gulp-filter');
 const fs = require('fs');
-const { parallel, series, src, dest, watch } = require('gulp');
+const {parallel, series, src, dest, watch} = require('gulp');
 const gutil = require('gulp-util');
 const Immutable = require('../');
 const gulpLess = require('gulp-less');
-const git = require('gulp-git')
+const git = require('gulp-git');
 const mkdirp = require('mkdirp');
 const path = require('path');
-const React = require('react/addons');
+const React = require('react');
 const reactTools = require('react-tools');
 const size = require('gulp-size');
 const source = require('vinyl-source-stream');
@@ -42,7 +42,7 @@ const SRC_DIR = '../pages/src/';
 const BUILD_DIR = '../pages/out/';
 
 function clean() {
-  return del([BUILD_DIR], { force: true });
+  return del([BUILD_DIR], {force: true});
 }
 
 function readme(done) {
@@ -60,20 +60,29 @@ function readme(done) {
   done();
 }
 
+function execPromise(command) {
+  return new Promise((resolve, reject) => {
+    childProcess.exec(command, (error, out) => (error ? reject(error) : resolve(out)));
+  });
+}
+
 function typedefs(done) {
   mkdirp.sync('../pages/generated/type-definitions');
 
-  let result = '';
   let latestTag;
 
-  childProcess.exec("git tag").then(function(result) {
-    var tags = result.stdout.split("\n")
-      .filter(function(tag) { return semver.valid(tag) })
-      .sort(function(tagA, tagB) { return semver.compare(tagA, tagB) });
+  childProcess.exec('git tag').then(function (gitTagResult) {
+    const tags = gitTagResult.stdout.split('\n')
+      .filter(function (tag) {
+        return semver.valid(tag);
+      })
+      .sort(function (tagA, tagB) {
+        return semver.compare(tagA, tagB);
+      });
 
     latestTag = tags[tags.length - 1];
 
-    var tagsObj = {};
+    const tagsObj = {};
 
     tags.forEach(function (tag) {
       if (!semver.prerelease(tag)) {
@@ -83,25 +92,25 @@ function typedefs(done) {
 
     tagsObj[latestTag] = latestTag;
 
-    Promise.all(Object.entries(tagsObj).map(function (tagEntry) {
+    return Promise.all(Object.entries(tagsObj).map(function (tagEntry) {
       const docName = tagEntry[0];
       const tag = tagEntry[1];
 
       return childProcess
-        .exec("git show " + tag + ":" + "type-definitions/Immutable.d.ts")
-        .then(function (result) {
+        .exec('git show ' + tag + ':' + 'type-definitions/Immutable.d.ts')
+        .then(function (gitShowResult) {
           const defPath = '../pages/generated/type-definitions/Immutable' +
-           (docName !== latestTag ? '-' + docName : '') +
-           '.d.ts';
-          fs.writeFileSync(defPath, result.stdout, 'utf8');
+            (docName !== latestTag ? '-' + docName : '') +
+            '.d.ts';
+          fs.writeFileSync(defPath, gitShowResult.stdout, 'utf8');
           return [docName, {
             path: defPath,
             tag: tag,
           }];
         });
     }));
-  }).then(function(tagEntries) {
-    var genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
+  }).then(function (tagEntries) {
+    const genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
 
     tagEntries.forEach(function (tagEntry) {
       var docName = tagEntry[0];
@@ -109,16 +118,16 @@ function typedefs(done) {
       var tag = tagEntry[1].tag;
       var fileContents = fs.readFileSync(typeDefPath, 'utf8');
 
-    const fileSource = fileContents.replace(
-        "module 'immutable'",
+      const fileSource = fileContents.replace(
+        'module \'immutable\'',
         'module Immutable'
       );
 
       var writePath = path.join(
-          __dirname,
-          '../pages/generated/immutable' +
-          (docName !== latestTag ? '-' + docName : '') +
-          '.d.json'
+        __dirname,
+        '../pages/generated/immutable' +
+        (docName !== latestTag ? '-' + docName : '') +
+        '.d.json'
       );
 
       try {
@@ -130,14 +139,14 @@ function typedefs(done) {
 
         mkdirp.sync(path.dirname(writePath));
         fs.writeFileSync(writePath, contents);
-      } catch(e) {
+      } catch (e) {
         console.error('Unable to build verion ' + docName + ':');
         console.error(e.message);
       }
     });
     done();
   });
-});
+}
 
 function js() {
   return gulpJS('');
@@ -163,8 +172,8 @@ function gulpJS(subDir) {
     })
       .add('./src/index.js')
       .require('./src/index.js')
-      .require(reactGlobalModulePath, { expose: 'react' })
-      .require(immutableGlobalModulePath, { expose: 'immutable' })
+      .require(reactGlobalModulePath, {expose: 'react'})
+      .require(immutableGlobalModulePath, {expose: 'immutable'})
       // Helpful when developing with no wifi
       // .require('react', { expose: 'react' })
       // .require('immutable', { expose: 'immutable' })
@@ -182,7 +191,7 @@ function gulpJS(subDir) {
       .pipe(sourcemaps.write('./maps'))
       .pipe(dest(BUILD_DIR + subDir))
       .pipe(filter('**/*.js'))
-      .pipe(size({ showFiles: true }))
+      .pipe(size({showFiles: true}))
       .on('error', handleError)
   );
 }
@@ -195,45 +204,45 @@ function preRender() {
   return gulpPreRender({
     html: 'index.html',
     src: 'readme.json',
-  })
+  });
 }
 
 function preRenderDocs() {
   return gulpPreRender({
     html: 'docs/index.html',
     src: 'immutable.d.json',
-  })
+  });
 }
 
 function preRenderVersioned() {
   return gulpPreRender({
     html: 'index.html',
     src: 'readme-*.json',
-  })
+  });
 }
 
 function preRenderVersionedDocs() {
   return gulpPreRender({
     html: 'docs/index.html',
     src: 'immutable-*.d.json',
-  })
+  });
 }
 
 function gulpPreRender(options) {
   return src(path.join('../pages/generated', options.src))
     .pipe(reactPreRender(options.html))
-    .pipe(size({ showFiles: true }))
+    .pipe(size({showFiles: true}))
     .pipe(rename(function (path) {
-      var suffix = "";
-      var match;
-      if (match = /-(\d+\.\d+)\.d$/.exec(path.basename)) {
+      let suffix = '';
+      const match = /-(\d+\.\d+)\.d$/.exec(path.basename);
+      if (match) {
         suffix = match[1];
       }
+      path.dirname = '';
       path.basename = suffix || 'index';
       path.extname = '.html';
     }))
-    .pipe(gulp.dest(path.join(BUILD_DIR, path.dirname(options.html))))
-    .pipe(dest(BUILD_DIR + subDir))
+    .pipe(dest(path.join(BUILD_DIR, path.dirname(options.html))))
     .on('error', handleError);
 }
 
@@ -258,8 +267,8 @@ function gulpLessTask(subDir) {
     .pipe(sourcemaps.write('./maps'))
     .pipe(dest(BUILD_DIR + subDir))
     .pipe(filter('**/*.css'))
-    .pipe(size({ showFiles: true }))
-    .pipe(browserSync.reload({ stream: true }))
+    .pipe(size({showFiles: true}))
+    .pipe(browserSync.reload({stream: true}))
     .on('error', handleError);
 }
 
@@ -275,23 +284,23 @@ function gulpStatics(subDir) {
   return src(SRC_DIR + subDir + 'static/**/*')
     .pipe(dest(BUILD_DIR + subDir + 'static'))
     .on('error', handleError)
-    .pipe(browserSync.reload({ stream: true }))
+    .pipe(browserSync.reload({stream: true}))
     .on('error', handleError);
 }
 
 function immutableCopy() {
   return src('../dist/immutable.js')
-    .pipe(gulp.dest(BUILD_DIR))
+    .pipe(dest(BUILD_DIR))
     .on('error', handleError)
-    .pipe(browserSync.reload({ stream: true }))
+    .pipe(browserSync.reload({stream: true}))
     .on('error', handleError);
 }
 
 
 function gulpJsonp() {
-  return through.obj(function(file, enc, cb) {
+  return through.obj(function (file, enc, cb) {
     var jsonp = 'window.data = JSON.parse(' + JSON.stringify(file.contents.toString()) + ');';
-    file.contents = new Buffer(jsonp, enc);
+    file.contents = Buffer.from(jsonp, enc);
     this.push(file);
     cb();
   });
@@ -300,20 +309,21 @@ function gulpJsonp() {
 function jsonpTask() {
   return src(['../pages/generated/immutable-*.d.json', '../pages/generated/immutable.d.json'])
     .pipe(gulpJsonp())
-    .pipe(rename(function(path) {
-      path.extname = ".jsonp";
+    .pipe(rename(function (path) {
+      path.extname = '.jsonp';
     }))
-    .pipe(gulp.dest(path.join(BUILD_DIR, "docs/defs")))
+    .pipe(dest(path.join(BUILD_DIR, 'docs/defs')))
     .on('error', handleError)
-    .pipe(browserSync.reload({ stream: true }))
+    .pipe(browserSync.reload({stream: true}))
     .on('error', handleError);
 }
 
 const build = parallel(
   typedefs,
   readme,
-  series(js, jsDocs, jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs),
-  series(preRender, preRenderDocs, preRenderVersioned, preRenderVersionedDocs)
+  series(js, jsDocs, jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs,
+    parallel(preRender, preRenderDocs, preRenderVersioned, preRenderVersionedDocs)
+  )
 );
 
 const defaultTask = series(clean, build);
@@ -358,10 +368,11 @@ function handleError(error) {
 }
 
 function reactPreRender(htmlPath) {
-  var srcHtml = fs.readFileSync(path.join('../pages/src', htmlPath), 'utf8');
-  var subDir = path.dirname(htmlPath);
+  const srcHtml = fs.readFileSync(path.join('../pages/src', htmlPath), 'utf8');
+  const subDir = path.dirname(htmlPath);
+  console.log('reactPreRender', htmlPath, subDir);
 
-  return through.obj(function(file, enc, cb) {
+  return through.obj(function (file, enc, cb) {
     var data = JSON.parse(file.contents.toString(enc));
     markdownDocs(data);
     var components = [];
@@ -375,19 +386,19 @@ function reactPreRender(htmlPath) {
         var component = path.resolve(SRC_DIR, subDir, relComponent);
         components.push(component);
         try {
+          const content = fs.readFileSync(path.join(BUILD_DIR, subDir, 'bundle.js'));
           return (
             '<div id="' +
             id +
             '">' +
-            vm.runInNewContext(
-            fs.readFileSync(path.join(BUILD_DIR, subDir, 'bundle.js')) + // ugly
-                '\nrequire("react").renderToString(' +
-                'require("react").createElement(require(component)))',
+            vm.runInNewContext(content + // ugly
+              '\nrequire("react").renderToString(' +
+              'require("react").createElement(require(component)))',
               {
                 global: {
                   React: React,
                   Immutable: Immutable,
-                data: data,
+                  data: data,
                 },
                 window: {},
                 component: component,
@@ -397,10 +408,11 @@ function reactPreRender(htmlPath) {
             '</div>'
           );
         } catch (error) {
+          console.log('failed to render target', error);
           return '<div id="' + id + '">' + error.message + '</div>';
         }
-    }).replace(
-      "<!-- JSONP(defs/immutable.d.jsonp) -->",
+      }).replace(
+      '<!-- JSONP(defs/immutable.d.jsonp) -->',
       '<script src="defs/immutable' + suffix + '.d.jsonp"></script>'
     );
 
@@ -408,23 +420,23 @@ function reactPreRender(htmlPath) {
       html = html.replace(
         /<!--\s*ReactRender\(\)\s*-->/g,
         '<script>' +
-          components.map((component, index) => {
-            return (
-              'var React = require("react");' +
-              'React.render(' +
-              'React.createElement(require("' +
-              component +
-              '")),' +
-              'document.getElementById("r' +
-              index +
-              '")' +
-              ');'
-            );
-          }) +
-          '</script>'
+        components.map((component, index) => {
+          return (
+            'var React = require("react");' +
+            'React.render(' +
+            'React.createElement(require("' +
+            component +
+            '")),' +
+            'document.getElementById("r' +
+            index +
+            '")' +
+            ');'
+          );
+        }) +
+        '</script>'
       );
     }
-    file.contents = new Buffer.from(html, enc);
+    file.contents = Buffer.from(html, enc);
     this.push(file);
     cb();
   });
@@ -441,9 +453,9 @@ function reactTransformify(filePath) {
       code += file;
       cb();
     },
-    function(done) {
+    function (done) {
       try {
-        this.push(reactTools.transform(code, { harmony: true }));
+        this.push(reactTools.transform(code, {harmony: true}));
       } catch (error) {
         parseError = new gutil.PluginError('transform', {
           message: error.message,
