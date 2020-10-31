@@ -5,12 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var Router = require('react-router');
-var { Map, Seq } = require('../../../../');
-var defs = global.data;
+import React from 'react';
+import createClass from 'create-react-class';
+import { Link } from 'react-router-dom';
+import { Map, Seq } from '../../../../';
+const defs = global.data;
 
-var SideBar = React.createClass({
+const SideBar = createClass({
   render() {
     var type = defs.Immutable;
 
@@ -63,7 +64,7 @@ var SideBar = React.createClass({
     var label = typeName + (isFunction ? '()' : '');
 
     if (!isFocus) {
-      label = <Router.Link to={'/' + typeName}>{label}</Router.Link>;
+      label = <Link to={'/' + typeName}>{label}</Link>;
     }
 
     var memberGroups = this.props.memberGroups;
@@ -75,9 +76,9 @@ var SideBar = React.createClass({
             <section>
               <h4 className="groupTitle">Construction</h4>
               <div>
-                <Router.Link to={'/' + typeName + '/' + typeName}>
+                <Link to={'/' + typeName + '/' + typeName}>
                   {typeName + '()'}
-                </Router.Link>
+                </Link>
               </div>
             </section>
           )}
@@ -88,9 +89,9 @@ var SideBar = React.createClass({
               {functions
                 .map((t, name) => (
                   <div key={name}>
-                    <Router.Link to={'/' + typeName + '/' + name}>
+                    <Link to={'/' + typeName + '/' + name}>
                       {typeName + '.' + name + '()'}
-                    </Router.Link>
+                    </Link>
                   </div>
                 ))
                 .valueSeq()
@@ -110,12 +111,12 @@ var SideBar = React.createClass({
                         </h4>,
                         Seq(members).map(member => (
                           <div key={member.memberName}>
-                            <Router.Link
+                            <Link
                               to={'/' + typeName + '/' + member.memberName}
                             >
                               {member.memberName +
                                 (member.memberDef.signatures ? '()' : '')}
-                            </Router.Link>
+                            </Link>
                           </div>
                         )),
                       ])
@@ -149,4 +150,4 @@ function flattenSubmodules(modules, type, name) {
     : modules;
 }
 
-module.exports = SideBar;
+export default SideBar;

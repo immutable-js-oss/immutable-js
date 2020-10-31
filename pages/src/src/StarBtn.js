@@ -5,14 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var loadJSON = require('./loadJSON');
+import React from 'react';
+import createClass from 'create-react-class';
+import loadJSON from './loadJSON';
 
 // API endpoints
 // https://registry.npmjs.org/immutable/latest
 // https://api.github.com/repos/facebook/immutable-js
 
-var StarBtn = React.createClass({
+var StarBtn = createClass({
   getInitialState: function() {
     return { stars: null };
   },
@@ -50,4 +51,4 @@ var StarBtn = React.createClass({
   },
 });
 
-module.exports = StarBtn;
+export default StarBtn;

@@ -5,17 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-//var ReactTransitionEvents = require('react/lib/ReactTransitionEvents');
-var { CSSTransition, TransitionGroup } = require('react-transition-group');
-var Router = require('react-router');
-var { CallSigDef, MemberDef } = require('./Defs');
-var PageDataMixin = require('./PageDataMixin');
-var isMobile = require('./isMobile');
-var MarkDown = require('./MarkDown');
+import React from 'react';
+import createClass from 'create-react-class';
+import PropTypes from 'prop-types';
 
-var MemberDoc = React.createClass({
-  mixins: [PageDataMixin, Router.Navigation],
+//var ReactTransitionEvents from 'react/lib/ReactTransitionEvents');
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { Router, Link } from 'react-router-dom';
+import { CallSigDef, MemberDef } from './Defs';
+import isMobile from './isMobile';
+import MarkDown from './MarkDown';
+
+var MemberDoc = createClass({
+  childContextTypes: {
+    getPageData: PropTypes.func.isRequired,
+  },
 
   getInitialState() {
     var showDetail = this.props.showDetail;
@@ -86,12 +90,12 @@ var MemberDoc = React.createClass({
     return (
       <div className="interfaceMember">
         <h3 className="memberLabel">
-          <Router.Link
+          <Link
             to={'/' + memberAnchorLink}
             onClick={isMobile ? this.toggleDetail : null}
           >
             {(module ? module + '.' : '') + name + (isProp ? '' : '()')}
-          </Router.Link>
+          </Link>
         </h3>
         <TransitionGroup childFactory={makeSlideDown}>
           {showDetail && (
@@ -124,9 +128,9 @@ var MemberDoc = React.createClass({
                 <section>
                   <h4 className="infoHeader">Inherited from</h4>
                   <code>
-                    <Router.Link to={'/' + member.inherited.name + '/' + name}>
+                    <Link to={'/' + member.inherited.name + '/' + name}>
                       {member.inherited.name + '#' + name}
-                    </Router.Link>
+                    </Link>
                   </code>
                 </section>
               )}
@@ -134,9 +138,9 @@ var MemberDoc = React.createClass({
                 <section>
                   <h4 className="infoHeader">Overrides</h4>
                   <code>
-                    <Router.Link to={'/' + member.overrides.name + '/' + name}>
+                    <Link to={'/' + member.overrides.name + '/' + name}>
                       {member.overrides.name + '#' + name}
-                    </Router.Link>
+                    </Link>
                   </code>
                 </section>
               )}
@@ -172,11 +176,11 @@ var MemberDoc = React.createClass({
 });
 
 function makeSlideDown(child) {
-  // TODO bdurrer DO NOT MERGE LIKE THIS
+  // TODO bdurrer WORKAROUND, DO NOT MERGE LIKE THIS
   return <div>{child}</div>;
 }
 
-var SlideDown = React.createClass({
+var SlideDown = createClass({
   componentWillEnter(done) {
     this.slide(false, done);
   },
@@ -219,4 +223,4 @@ function offsetTop(node) {
   return top;
 }
 
-module.exports = MemberDoc;
+export default MemberDoc;

@@ -5,6 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var isMobile =
-  window.matchMedia && window.matchMedia('(max-device-width: 680px)');
-module.exports = false && !!(isMobile && isMobile.matches);
+// TODO useless, always false
+const isMobile = window.matchMedia && window.matchMedia('(max-device-width: 680px)');
+export default (false && !!(isMobile && isMobile.matches));

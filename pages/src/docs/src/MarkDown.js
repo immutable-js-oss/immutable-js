@@ -5,15 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
+import React from 'react';
+import createClass from 'create-react-class';
 
-var MarkDown = React.createClass({
+const MarkDown = createClass({
   shouldComponentUpdate() {
     return false;
   },
 
   render() {
-    var html = this.props.contents;
+    const html = this.props.contents;
     return (
       <div
         className={this.props.className}
@@ -23,4 +24,4 @@ var MarkDown = React.createClass({
   },
 });
 
-module.exports = MarkDown;
+export default MarkDown;

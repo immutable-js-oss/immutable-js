@@ -5,18 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var SVGSet = require('./SVGSet');
-var Logo = require('./Logo');
-var StarBtn = require('./StarBtn');
-var packageJson = require('../../../package.json');
-var defs = global.data;
+import React from 'react';
+import createClass from 'create-react-class';
+import SVGSet from './SVGSet';
+import Logo from './Logo';
+import StarBtn from './StarBtn';
+import packageJson from '../../../package.json';
+const defs = global.data;
 
 var isMobileMatch =
   window.matchMedia && window.matchMedia('(max-device-width: 680px)');
 var isMobile = isMobileMatch && isMobileMatch.matches;
 
-var Header = React.createClass({
+var Header = createClass({
   getInitialState: function() {
     return { scroll: 0 };
   },
@@ -145,4 +146,4 @@ function t(y, z) {
   };
 }
 
-module.exports = Header;
+export default Header;

@@ -5,13 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var Header = require('./Header');
-var readme = require('../../generated/readme.json');
+import React from 'react';
+import createClass from 'create-react-class';
+import Header from './Header';
+import readme from '../../generated/readme.json';
 
-require('../../lib/runkit-embed');
+import '../../lib/runkit-embed';
 
-var Index = React.createClass({
+var Index = createClass({
   render: function() {
     return (
       <div>
@@ -26,4 +27,4 @@ var Index = React.createClass({
   },
 });
 
-module.exports = Index;
+export default Index;

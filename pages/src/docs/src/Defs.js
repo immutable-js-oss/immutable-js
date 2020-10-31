@@ -5,13 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var Router = require('react-router');
-var { Seq } = require('../../../../');
-var TypeKind = require('../../../lib/TypeKind');
+import React from 'react';
+import createClass from 'create-react-class';
+import { Link } from 'react-router-dom';
+import { Seq } from '../../../../';
+import TypeKind from '../../../lib/TypeKind';
 var defs = global.data;
 
-var InterfaceDef = React.createClass({
+export const InterfaceDef = createClass({
   render() {
     var name = this.props.name;
     var def = this.props.def;
@@ -50,9 +51,8 @@ var InterfaceDef = React.createClass({
   },
 });
 
-exports.InterfaceDef = InterfaceDef;
 
-var CallSigDef = React.createClass({
+export const CallSigDef = createClass({
   render() {
     var info = this.props.info;
     var module = this.props.module;
@@ -82,9 +82,7 @@ var CallSigDef = React.createClass({
   },
 });
 
-exports.CallSigDef = CallSigDef;
-
-var TypeDef = React.createClass({
+export const TypeDef = createClass({
   getInitialState: function(){
     return {
       hover: false
@@ -206,9 +204,9 @@ var TypeDef = React.createClass({
         ];
         if (def) {
           typeNameElement = (
-            <Router.Link to={'/' + qualifiedTypeName}>
+            <Link to={'/' + qualifiedTypeName}>
               {typeNameElement}
-            </Router.Link>
+            </Link>
           );
         }
         return this.wrap('type', [
@@ -250,9 +248,7 @@ var TypeDef = React.createClass({
   },
 });
 
-exports.TypeDef = TypeDef;
-
-var MemberDef = React.createClass({
+export const MemberDef = createClass({
   render() {
     var module = this.props.module;
     var member = this.props.member;
@@ -269,8 +265,6 @@ var MemberDef = React.createClass({
     );
   },
 });
-
-exports.MemberDef = MemberDef;
 
 function functionParams(info, params, shouldWrap) {
   var elements = Seq(params)

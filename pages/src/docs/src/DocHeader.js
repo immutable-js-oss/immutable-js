@@ -5,12 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var SVGSet = require('../../src/SVGSet');
-var Logo = require('../../src/Logo');
-var defs = global.data; // injected by gulp
+import React from 'react';
+import createClass from 'create-react-class';
 
-var DocHeader = React.createClass({
+import SVGSet from '../../src/SVGSet';
+import Logo from '../../src/Logo';
+const defs = global.data; // injected by gulp
+
+const DocHeader = createClass({
   render() {
     return (
       <div className="header">
@@ -39,4 +41,4 @@ var DocHeader = React.createClass({
   },
 });
 
-module.exports = DocHeader;
+export default DocHeader;

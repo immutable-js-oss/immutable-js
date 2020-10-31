@@ -5,22 +5,23 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var Router = require('react-router');
-var { Seq } = require('../../../../');
-var { InterfaceDef, CallSigDef } = require('./Defs');
-var MemberDoc = require('./MemberDoc');
-var isMobile = require('./isMobile');
-var SideBar = require('./SideBar');
-var MarkDown = require('./MarkDown');
-var DocOverview = require('./DocOverview');
-var collectMemberGroups = require('../../../lib/collectMemberGroups');
-var TypeKind = require('../../../lib/TypeKind');
-var defs = global.data;
+import React from 'react';
+import createClass from 'create-react-class';
+import { Link } from 'react-router-dom';
+import { Seq } from '../../../../';
+import { InterfaceDef, CallSigDef } from './Defs';
+import MemberDoc from './MemberDoc';
+import isMobile from './isMobile';
+import SideBar from './SideBar';
+import MarkDown from './MarkDown';
+import DocOverview from './DocOverview';
+import collectMemberGroups from '../../../lib/collectMemberGroups';
+import TypeKind from '../../../lib/TypeKind';
+const defs = global.data;
 
-var typeDefURL =
-  'https://github.com/facebook/immutable-js/blob/master/type-definitions/Immutable.d.ts';
-var issuesURL = 'https://github.com/facebook/immutable-js/issues';
+const typeDefURL =
+  'https://github.com/immutable-js-oss/immutable-js/blob/master/type-definitions/Immutable.d.ts';
+const issuesURL = 'https://github.com/immutable-js-oss/immutable-js/issues';
 
 var Disclaimer = function() {
   return (
@@ -32,7 +33,7 @@ var Disclaimer = function() {
   );
 };
 
-var TypeDocumentation = React.createClass({
+var TypeDocumentation = createClass({
   getInitialState() {
     return {
       showInherited: true,
@@ -95,7 +96,7 @@ function NotFound() {
   return <div>Not found</div>;
 }
 
-var FunctionDoc = React.createClass({
+var FunctionDoc = createClass({
   render() {
     var name = this.props.name;
     var def = this.props.def;
@@ -140,7 +141,7 @@ var FunctionDoc = React.createClass({
   },
 });
 
-var TypeDoc = React.createClass({
+var TypeDoc = createClass({
   render() {
     var name = this.props.name;
     var def = this.props.def;
@@ -195,11 +196,11 @@ var TypeDoc = React.createClass({
             {types
               .map((t, typeName) => (
                 <div key={typeName}>
-                  <Router.Link
+                  <Link
                     to={'/' + (name ? name + '.' + typeName : typeName)}
                   >
                     {name ? name + '.' + typeName : typeName}
-                  </Router.Link>
+                  </Link>
                 </div>
               ))
               .valueSeq()
@@ -329,4 +330,4 @@ function getTypePropMap(def) {
   return map;
 }
 
-module.exports = TypeDocumentation;
+export default TypeDocumentation;

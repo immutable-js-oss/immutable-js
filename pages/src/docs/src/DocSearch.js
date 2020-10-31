@@ -1,6 +1,7 @@
-var React = require('react');
+import React from 'react';
+import createClass from 'create-react-class';
 
-var DocSearch = React.createClass({
+const DocSearch = createClass({
   getInitialState() {
     return { enabled: true };
   },
@@ -46,4 +47,4 @@ var DocSearch = React.createClass({
   },
 });
 
-module.exports = DocSearch;
+export default DocSearch;

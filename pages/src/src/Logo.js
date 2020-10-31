@@ -5,9 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
+import React from 'react';
+import createClass from 'create-react-class';
 
-var Logo = React.createClass({
+const Logo = createClass({
   shouldComponentUpdate: function(nextProps) {
     return nextProps.opacity !== this.props.opacity;
   },
@@ -86,4 +87,4 @@ var Logo = React.createClass({
   },
 });
 
-module.exports = Logo;
+export default Logo;

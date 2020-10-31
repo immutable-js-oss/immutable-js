@@ -5,9 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
+import React from 'react';
+import createClass from 'create-react-class';
 
-var SVGSet = React.createClass({
+var SVGSet = createClass({
   render: function() {
     return (
       <svg className="svg" style={this.props.style} viewBox="0 0 300 42.2">
@@ -17,4 +18,4 @@ var SVGSet = React.createClass({
   },
 });
 
-module.exports = SVGSet;
+export default SVGSet;

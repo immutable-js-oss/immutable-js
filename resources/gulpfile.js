@@ -8,6 +8,7 @@
 const browserify = require('browserify');
 const browserSync = require('browser-sync');
 const buffer = require('vinyl-buffer');
+const source  = require('vinyl-source-stream');
 const childProcess = require('child-process-promise');
 const concat = require('gulp-concat');
 const del = require('del');
@@ -17,20 +18,18 @@ const {parallel, series, src, dest, watch} = require('gulp');
 const gutil = require('gulp-util');
 const Immutable = require('../');
 const gulpLess = require('gulp-less');
-const git = require('gulp-git');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const React = require('react');
+const ReactDOMServer = require('react-dom/server');
 const reactTools = require('react-tools');
 const size = require('gulp-size');
-const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
 const uglify = require('gulp-uglify');
 const vm = require('vm');
 const rename = require('gulp-rename');
 const semver = require('semver');
-const markdownDocs = require('../pages/lib/markdownDocs');
 
 
 function requireFresh(path) {
@@ -71,59 +70,58 @@ function typedefs(done) {
 
   let latestTag;
 
-  childProcess.exec('git tag').then(function (gitTagResult) {
+  childProcess.exec('git tag --list --sort="-v:refname"').then(function (gitTagResult) {
     const tags = gitTagResult.stdout.split('\n')
-      .filter(function (tag) {
-        return semver.valid(tag);
-      })
-      .sort(function (tagA, tagB) {
-        return semver.compare(tagA, tagB);
-      });
-
-    latestTag = tags[tags.length - 1];
+      .filter(tag => semver.valid(semver.coerce(tag)))
+      .filter(tag => semver.gte(tag, '3.0.0')) // Anything below 3.0 does not compile with this gulp script
+      .sort((tagA, tagB) => 0 - semver.compare(semver.clean(tagA), semver.clean(tagB)));
+    latestTag = tags[0];
 
     const tagsObj = {};
 
-    tags.forEach(function (tag) {
-      if (!semver.prerelease(tag)) {
-        tagsObj[semver.major(tag) + '.' + semver.minor(tag)] = tag;
+    tags.forEach(tag => {
+      const label = `${semver.major(tag)}.${semver.minor(tag)}`;
+
+      if (!tagsObj[label]) {
+        tagsObj[label] = tag;
       }
     });
 
+    // take latest 20 major.minor releases (take latest patch version, including release candidates)
+    const sortedVersions = Object.entries(tagsObj)
+      .sort((entryA, entryB) => {
+        const tagA = semver.clean(entryA[1]);
+        const tagB = semver.clean(entryB[1]);
+
+        return 0 - semver.compare(semver.clean(tagA), semver.clean(tagB));
+      })
+      .slice(0, 20);
+
     tagsObj[latestTag] = latestTag;
 
-    return Promise.all(Object.entries(tagsObj).map(function (tagEntry) {
-      const docName = tagEntry[0];
-      const tag = tagEntry[1];
-
-      return childProcess
-        .exec('git show ' + tag + ':' + 'type-definitions/Immutable.d.ts')
+    return Promise.all(Object.entries(tagsObj).map(([docName, tag]) =>
+      childProcess
+        .exec(`git show ${tag}:type-definitions/Immutable.d.ts`)
         .then(function (gitShowResult) {
           const defPath = '../pages/generated/type-definitions/Immutable' +
             (docName !== latestTag ? '-' + docName : '') +
             '.d.ts';
           fs.writeFileSync(defPath, gitShowResult.stdout, 'utf8');
-          return [docName, {
-            path: defPath,
-            tag: tag,
-          }];
-        });
-    }));
+          return [docName, defPath, tag];
+        })
+    ));
   }).then(function (tagEntries) {
-    const genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
-
-    tagEntries.forEach(function (tagEntry) {
-      var docName = tagEntry[0];
-      var typeDefPath = tagEntry[1].path;
-      var tag = tagEntry[1].tag;
-      var fileContents = fs.readFileSync(typeDefPath, 'utf8');
+    const failedVersions = [];
+    tagEntries.forEach(function ([docName, typeDefPath, tag]) {
+      gutil.log('Build type defs for version', docName, `(${tag})`);
+      const fileContents = fs.readFileSync(typeDefPath, 'utf8');
 
       const fileSource = fileContents.replace(
         'module \'immutable\'',
         'module Immutable'
       );
 
-      var writePath = path.join(
+      const writePath = path.join(
         __dirname,
         '../pages/generated/immutable' +
         (docName !== latestTag ? '-' + docName : '') +
@@ -131,21 +129,26 @@ function typedefs(done) {
       );
 
       try {
-        var defs = genTypeDefData(typeDefPath, fileSource);
-        markdownDocs(defs);
+        const genTypeDefData = requireFresh('../pages/lib/genTypeDefData');
+        const defs = genTypeDefData(typeDefPath, fileSource);
         defs.Immutable.version = /^v?(.*)/.exec(tag)[1];
-        var contents = JSON.stringify(defs);
-
+        const contents = JSON.stringify(defs);
 
         mkdirp.sync(path.dirname(writePath));
         fs.writeFileSync(writePath, contents);
       } catch (e) {
-        console.error('Unable to build verion ' + docName + ':');
-        console.error(e.message);
+        console.error('Unable to build version ' + docName + ':', e.message);
+        failedVersions.push([docName, e]);
       }
     });
-    done();
-  });
+
+    if (failedVersions.length) {
+      failedVersions.forEach(([ver]) => console.log('Failed version', ver));
+      throw failedVersions[0][1];
+    }
+  })
+    .then(() => done())
+    .catch(error => done(error));
 }
 
 function js() {
@@ -157,43 +160,36 @@ function jsDocs() {
 }
 
 function gulpJS(subDir) {
-  const reactGlobalModulePath = path.relative(
-    path.resolve(SRC_DIR + subDir),
-    path.resolve('./react-global.js')
-  );
-  const immutableGlobalModulePath = path.relative(
-    path.resolve(SRC_DIR + subDir),
-    path.resolve('./immutable-global.js')
-  );
-  return (
-    browserify({
-      debug: true,
-      basedir: SRC_DIR + subDir,
+  // You don't need the es2015 preset package, but you should use because you don't hate yourself enough to write old JavaScript
+  const root = path.join(SRC_DIR, subDir, 'src/index.js');
+  return browserify(root, { debug:true })
+    .transform('babelify', {
+      presets: [
+        ["@babel/preset-env", { targets: "> 0.25%, not dead" }],
+        "@babel/preset-react",
+      ],
     })
-      .add('./src/index.js')
-      .require('./src/index.js')
-      .require(reactGlobalModulePath, {expose: 'react'})
-      .require(immutableGlobalModulePath, {expose: 'immutable'})
-      // Helpful when developing with no wifi
-      // .require('react', { expose: 'react' })
-      // .require('immutable', { expose: 'immutable' })
-      .transform(reactTransformify)
-      .bundle()
-      .on('error', handleError)
-      .pipe(source('bundle.js'))
-      .pipe(buffer())
-      .pipe(
-        sourcemaps.init({
-          loadMaps: true,
-        })
-      )
-      //.pipe(uglify())
-      .pipe(sourcemaps.write('./maps'))
-      .pipe(dest(BUILD_DIR + subDir))
-      .pipe(filter('**/*.js'))
-      .pipe(size({showFiles: true}))
-      .on('error', handleError)
-  );
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(sourcemaps.write('.'))
+    .pipe(dest(BUILD_DIR + subDir))
+    .on('error', handleError);
+/*
+  return src(SRC_DIR + subDir + '/ * * / *.js')
+    .pipe(sourcemaps.init())
+    .pipe(babel({
+      presets: [
+        ["@babel/preset-env", { targets: "> 0.25%, not dead", modules: "umd" }],
+        "@babel/preset-react",
+      ]
+    }))
+    .pipe(concat("bundle.js"))
+    .pipe(sourcemaps.write("."))
+    .pipe(dest(BUILD_DIR + subDir))
+    .on('error', handleError);
+*/
 }
 
 function preRender() {
@@ -318,12 +314,11 @@ function jsonpTask() {
     .on('error', handleError);
 }
 
-const build = parallel(
+const build = series(
   typedefs,
   readme,
-  series(js, jsDocs, jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs,
-    parallel(preRender, preRenderDocs, preRenderVersioned, preRenderVersionedDocs)
-  )
+  series(js, jsDocs, jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs),
+  series(preRender, preRenderDocs, preRenderVersioned, preRenderVersionedDocs)
 );
 
 const defaultTask = series(clean, build);
@@ -373,8 +368,7 @@ function reactPreRender(htmlPath) {
   console.log('reactPreRender', htmlPath, subDir);
 
   return through.obj(function (file, enc, cb) {
-    var data = JSON.parse(file.contents.toString(enc));
-    markdownDocs(data);
+    const data = JSON.parse(file.contents.toString(enc));
     var components = [];
 
     var suffixMatch = /-\d+\.\d+(?=\.d\.json)/.exec(file.path);
@@ -387,26 +381,29 @@ function reactPreRender(htmlPath) {
         components.push(component);
         try {
           const content = fs.readFileSync(path.join(BUILD_DIR, subDir, 'bundle.js'));
-          return (
-            '<div id="' +
-            id +
-            '">' +
-            vm.runInNewContext(content + // ugly
-              '\nrequire("react").renderToString(' +
-              'require("react").createElement(require(component)))',
-              {
-                global: {
-                  React: React,
-                  Immutable: Immutable,
-                  data: data,
-                },
-                window: {},
-                component: component,
-                console: console,
-              }
-            ) +
-            '</div>'
+
+          const rendered = vm.runInNewContext(content
+            //+ // ugly
+            //'\nReactDOMServer.renderToString(' +
+            //'React.createElement(require(component)))',
+            ,
+            {
+              global: {
+                React: React,
+                Immutable: Immutable,
+                data: data,
+                ReactDOMServer,
+              },
+              window: {},
+              component: component,
+              console: console,
+              require,
+              ReactDOMServer,
+              React: React,
+            }
           );
+
+          return `<div id="${id}">${rendered}</div>`;
         } catch (error) {
           console.log('failed to render target', error);
           return '<div id="' + id + '">' + error.message + '</div>';

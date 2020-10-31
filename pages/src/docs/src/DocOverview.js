@@ -5,12 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var Router = require('react-router');
-var { Seq } = require('../../../../');
-var Markdown = require('./MarkDown');
+import React from 'react';
+import createClass from 'create-react-class';
+import { Link } from 'react-router-dom';
+import { Seq } from '../../../../';
+import Markdown from './MarkDown';
 
-var DocOverview = React.createClass({
+const DocOverview = createClass({
   render() {
     var def = this.props.def;
     var doc = def.doc;
@@ -35,9 +36,9 @@ var DocOverview = React.createClass({
             return (
               <section key={name} className="interfaceMember">
                 <h3 className="memberLabel">
-                  <Router.Link to={'/' + name}>
+                  <Link to={'/' + name}>
                     {name + (isFunction ? '()' : '')}
-                  </Router.Link>
+                  </Link>
                 </h3>
                 {t.doc && (
                   <Markdown className="detail" contents={t.doc.synopsis} />
@@ -52,4 +53,4 @@ var DocOverview = React.createClass({
   },
 });
 
-module.exports = DocOverview;
+export default DocOverview;

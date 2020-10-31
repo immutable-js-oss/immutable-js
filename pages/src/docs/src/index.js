@@ -5,18 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var React = require('react');
-var Router = require('react-router');
-var DocHeader = require('./DocHeader');
-var DocSearch = require('./DocSearch.js');
-var TypeDocumentation = require('./TypeDocumentation');
-var defs = global.data; // injected by gulp
+import React from 'react';
+import createClass from 'create-react-class';
+import PropTypes from 'prop-types';
 
-var { Route, DefaultRoute, RouteHandler } = Router;
+import { Router, Route, RouteHandler } from 'react-router-dom';
+import DocHeader from './DocHeader';
+import DocSearch from './DocSearch.js';
+import TypeDocumentation from './TypeDocumentation';
+const defs = global.data; // injected by gulp
 
-require('../../../lib/runkit-embed');
+// TODO DO NOT MERGE: Fix the stupid router
 
-var Documentation = React.createClass({
+import '../../../lib/runkit-embed';
+
+var Documentation = createClass({
   render() {
     return (
       <div>
@@ -32,11 +35,12 @@ var Documentation = React.createClass({
   },
 });
 
-var DocDeterminer = React.createClass({
-  mixins: [Router.State],
-
+var DocDeterminer = createClass({
+  childContextTypes: {
+    router: PropTypes.object.isRequired,
+  },
   render() {
-    var { def, name, memberName } = determineDoc(this.getPath());
+    var { def, name, memberName } = determineDoc(this.context.router.getCurrentPath());
     return <TypeDocumentation def={def} name={name} memberName={memberName} />;
   },
 });
@@ -53,9 +57,9 @@ function determineDoc(path) {
   return { def, name, memberName };
 }
 
-module.exports = React.createClass({
+module.exports = createClass({
   childContextTypes: {
-    getPageData: React.PropTypes.func.isRequired,
+    getPageData: PropTypes.func.isRequired,
   },
 
   getChildContext() {
@@ -108,7 +112,7 @@ module.exports = React.createClass({
     Router.create({
       routes: (
         <Route handler={Documentation} path="/">
-          <DefaultRoute handler={DocDeterminer} />
+          <Route exact path="/" handler={DocDeterminer} />
           <Route name="type" path="/:name" handler={DocDeterminer} />
           <Route
             name="method"
