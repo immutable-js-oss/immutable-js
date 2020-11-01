@@ -6,16 +6,19 @@
  */
 
 import React from 'react';
-import createClass from 'create-react-class';
+import PropTypes from 'prop-types';
 
-var SVGSet = createClass({
-  render: function() {
-    return (
-      <svg className="svg" style={this.props.style} viewBox="0 0 300 42.2">
-        {this.props.children}
-      </svg>
-    );
-  },
-});
+function SVGSet(props) {
+  return (
+    <svg className="svg" style={props.style} viewBox="0 0 300 42.2">
+      {props.children}
+    </svg>
+  );
+}
+
+SVGSet.propTypes = {
+  style: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  children: PropTypes.any,
+};
 
 export default SVGSet;

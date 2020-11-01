@@ -21,8 +21,6 @@ const gulpLess = require('gulp-less');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const reactTools = require('react-tools');
 const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
@@ -31,6 +29,9 @@ const vm = require('vm');
 const rename = require('gulp-rename');
 const semver = require('semver');
 
+const packageInfo = require('../package.json');
+
+let isWatching = false;
 
 function requireFresh(path) {
   delete require.cache[require.resolve(path)];
@@ -52,7 +53,10 @@ function readme(done) {
   const fileContents = fs.readFileSync(readmePath, 'utf8');
 
   const writePath = path.join(__dirname, '../pages/generated/readme.json');
-  const contents = JSON.stringify(genMarkdownDoc(fileContents));
+  const contents = JSON.stringify({
+    content: genMarkdownDoc(fileContents),
+    package: packageInfo,
+  });
 
   mkdirp.sync(path.dirname(writePath));
   fs.writeFileSync(writePath, contents);
@@ -152,48 +156,39 @@ function typedefs(done) {
 }
 
 function js() {
-  return gulpJS('');
+  return gulpJS('', 'bundle.js');
 }
 
 function jsDocs() {
-  return gulpJS('docs/');
+  return gulpJS('docs/', 'bundle.js');
 }
 
-function gulpJS(subDir) {
-  // You don't need the es2015 preset package, but you should use because you don't hate yourself enough to write old JavaScript
-  const root = path.join(SRC_DIR, subDir, 'src/index.js');
-  return browserify(root, { debug:true })
+function jsServer() {
+  return gulpJS('', 'server.js');
+}
+
+function jsServerDocs() {
+  return gulpJS('docs/', 'server.js');
+}
+
+function gulpJS(subDir, rootFile) {
+  // We don't have ourself enough to write old Javascript, so let's transform with the es2015 preset package
+  const sourcePath = path.join(SRC_DIR, subDir, 'src', rootFile);
+  return browserify(sourcePath, { debug:true })
     .transform('babelify', {
       presets: [
-        ["@babel/preset-env", { targets: "> 0.25%, not dead" }],
-        "@babel/preset-react",
+        ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
+        '@babel/preset-react',
       ],
+      plugins: ['@babel/plugin-proposal-class-properties']
     })
     .bundle()
-    .pipe(source('bundle.js'))
+    .pipe(source(rootFile))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(sourcemaps.write('.'))
     .pipe(dest(BUILD_DIR + subDir))
     .on('error', handleError);
-/*
-  return src(SRC_DIR + subDir + '/ * * / *.js')
-    .pipe(sourcemaps.init())
-    .pipe(babel({
-      presets: [
-        ["@babel/preset-env", { targets: "> 0.25%, not dead", modules: "umd" }],
-        "@babel/preset-react",
-      ]
-    }))
-    .pipe(concat("bundle.js"))
-    .pipe(sourcemaps.write("."))
-    .pipe(dest(BUILD_DIR + subDir))
-    .on('error', handleError);
-*/
-}
-
-function preRender() {
-  return gulpPreRender('');
 }
 
 function preRender() {
@@ -207,13 +202,6 @@ function preRenderDocs() {
   return gulpPreRender({
     html: 'docs/index.html',
     src: 'immutable.d.json',
-  });
-}
-
-function preRenderVersioned() {
-  return gulpPreRender({
-    html: 'index.html',
-    src: 'readme-*.json',
   });
 }
 
@@ -317,8 +305,9 @@ function jsonpTask() {
 const build = series(
   typedefs,
   readme,
-  series(js, jsDocs, jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs),
-  series(preRender, preRenderDocs, preRenderVersioned, preRenderVersionedDocs)
+  parallel(js, jsDocs, jsServer, jsServerDocs),
+  series(jsonpTask, less, lessDocs, immutableCopy, statics, staticsDocs),
+  series(preRender, preRenderDocs, preRenderVersionedDocs)
 );
 
 const defaultTask = series(clean, build);
@@ -335,24 +324,24 @@ function watchFiles() {
   watch('../README.md', build);
   watch('../pages/lib/**/*.js', build);
   watch('../pages/src/**/*.less', series(less, lessDocs));
-  watch('../pages/src/src/**/*.js', rebuildJS);
-  watch('../pages/src/docs/src/**/*.js', rebuildJSDocs);
+  watch('../pages/src/src/**/*.js', rebuildJS());
+  watch('../pages/src/docs/src/**/*.js', rebuildJSDocs());
   watch('../pages/src/**/*.html', series(preRender, preRenderDocs));
   watch('../pages/src/static/**/*', series(statics, staticsDocs));
-  watch('../type-definitions/*', parallel(typedefs, rebuildJSDocs));
+  watch('../type-definitions/*', parallel(typedefs, rebuildJSDocs()));
 }
 
 const dev = series(defaultTask, watchFiles);
 
-function rebuildJS(done) {
-  parallel(js, preRender, () => {
+function rebuildJS() {
+  return series(js, preRender, (done) => {
     browserSync.reload();
     done();
   });
 }
 
-function rebuildJSDocs(done) {
-  parallel(jsDocs, preRenderDocs, () => {
+function rebuildJSDocs() {
+  return series(jsDocs, preRenderDocs, (done) => {
     browserSync.reload();
     done();
   });
@@ -365,104 +354,49 @@ function handleError(error) {
 function reactPreRender(htmlPath) {
   const srcHtml = fs.readFileSync(path.join('../pages/src', htmlPath), 'utf8');
   const subDir = path.dirname(htmlPath);
-  console.log('reactPreRender', htmlPath, subDir);
 
   return through.obj(function (file, enc, cb) {
     const data = JSON.parse(file.contents.toString(enc));
-    var components = [];
-
     var suffixMatch = /-\d+\.\d+(?=\.d\.json)/.exec(file.path);
     var suffix = suffixMatch ? suffixMatch[0] : '';
 
-    var html = srcHtml.replace(/<!--\s*React\(\s*(.*?)\s*\)\s*-->/g,
-      (_, relComponent) => {
-        var id = 'r' + components.length;
-        var component = path.resolve(SRC_DIR, subDir, relComponent);
-        components.push(component);
-        try {
-          const content = fs.readFileSync(path.join(BUILD_DIR, subDir, 'bundle.js'));
+    var html = srcHtml.replace(/<!--\s*ReactPreRender\(\)\s*-->/g, () => {
+      // Render the component into a string and insert it into the page, making the content available to crawlers.
+      // The bundled script will reuse the existing content
+      var componentPath = path.posix.normalize(path.posix.join(BUILD_DIR, subDir, 'server.js'));
+      try {
+        const componentContent = fs.readFileSync(componentPath);
+        const context = {
+          global: {
+            React: React,
+            Immutable: Immutable,
+            data,
+            output: '',
+          },
+          window: {
+            addEventListener() { /* fake */ },
+            removeEventListener() { /* fake */ },
+            data,
+          },
+          console,
+        };
 
-          const rendered = vm.runInNewContext(content
-            //+ // ugly
-            //'\nReactDOMServer.renderToString(' +
-            //'React.createElement(require(component)))',
-            ,
-            {
-              global: {
-                React: React,
-                Immutable: Immutable,
-                data: data,
-                ReactDOMServer,
-              },
-              window: {},
-              component: component,
-              console: console,
-              require,
-              ReactDOMServer,
-              React: React,
-            }
-          );
+        vm.runInNewContext(componentContent, context);
 
-          return `<div id="${id}">${rendered}</div>`;
-        } catch (error) {
-          console.log('failed to render target', error);
-          return '<div id="' + id + '">' + error.message + '</div>';
-        }
-      }).replace(
+        return `<div id="app">${context.global.output}</div>`;
+      } catch (error) {
+        console.log('failed to render target', error);
+        return '<div id="app">' + error.message + '</div>';
+      }
+    }).replace(
       '<!-- JSONP(defs/immutable.d.jsonp) -->',
       '<script src="defs/immutable' + suffix + '.d.jsonp"></script>'
     );
 
-    if (components.length) {
-      html = html.replace(
-        /<!--\s*ReactRender\(\)\s*-->/g,
-        '<script>' +
-        components.map((component, index) => {
-          return (
-            'var React = require("react");' +
-            'React.render(' +
-            'React.createElement(require("' +
-            component +
-            '")),' +
-            'document.getElementById("r' +
-            index +
-            '")' +
-            ');'
-          );
-        }) +
-        '</script>'
-      );
-    }
     file.contents = Buffer.from(html, enc);
     this.push(file);
     cb();
   });
-}
-
-function reactTransformify(filePath) {
-  if (path.extname(filePath) !== '.js') {
-    return through();
-  }
-  let code = '';
-  let parseError;
-  return through.obj(
-    (file, enc, cb) => {
-      code += file;
-      cb();
-    },
-    function (done) {
-      try {
-        this.push(reactTools.transform(code, {harmony: true}));
-      } catch (error) {
-        parseError = new gutil.PluginError('transform', {
-          message: error.message,
-          showStack: false,
-        });
-      }
-      parseError && this.emit('error', parseError);
-      done();
-    }
-  );
 }
 
 exports.dev = dev;

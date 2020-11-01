@@ -6,25 +6,22 @@
  */
 
 import React from 'react';
-import createClass from 'create-react-class';
 import Header from './Header';
 import readme from '../../generated/readme.json';
-
+console.log('readme is', readme);
 import '../../lib/runkit-embed';
 
-var Index = createClass({
-  render: function() {
-    return (
-      <div>
-        <Header />
-        <div className="pageBody" id="body">
-          <div className="contents">
-            <div dangerouslySetInnerHTML={{ __html: readme }} />
-          </div>
+function Index() {
+  return (
+    <div>
+      <Header package={readme.package} />
+      <div className="pageBody" id="body">
+        <div className="contents">
+          <div dangerouslySetInnerHTML={{ __html: readme.content }} />
         </div>
       </div>
-    );
-  },
-});
+    </div>
+  );
+}
 
 export default Index;

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 //var ReactTransitionEvents from 'react/lib/ReactTransitionEvents');
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { Router, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CallSigDef, MemberDef } from './Defs';
 import isMobile from './isMobile';
 import MarkDown from './MarkDown';
@@ -27,11 +27,10 @@ var MemberDoc = createClass({
   },
 
   componentDidMount() {
-    if (this.props.showDetail) {
-      var node = this.getDOMNode();
+    if (typeof window !== "undefined" && this.props.showDetail) {
       var navType = this.getPageData().type;
       if (navType === 'init' || navType === 'push') {
-        window.scrollTo(window.scrollX, offsetTop(node) - FIXED_HEADER_HEIGHT);
+        window.scrollTo(window.scrollX, offsetTop(this._container) - FIXED_HEADER_HEIGHT);
       }
     }
   },
@@ -44,12 +43,11 @@ var MemberDoc = createClass({
   },
 
   componentDidUpdate() {
-    if (this.scrollTo) {
+    if (typeof window !== "undefined" && this.scrollTo) {
       this.scrollTo = false;
-      var node = this.getDOMNode();
       var navType = this.getPageData().type;
       if (navType === 'init' || navType === 'push') {
-        window.scrollTo(window.scrollX, offsetTop(node) - FIXED_HEADER_HEIGHT);
+        window.scrollTo(window.scrollX, offsetTop(this._container) - FIXED_HEADER_HEIGHT);
       }
     }
   },
@@ -88,7 +86,7 @@ var MemberDoc = createClass({
     var memberAnchorLink = this.props.parentName + '/' + name;
 
     return (
-      <div className="interfaceMember">
+      <div className="interfaceMember" ref={(element) => { this._container = element; }}>
         <h3 className="memberLabel">
           <Link
             to={'/' + memberAnchorLink}

@@ -5,15 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import createClass from 'create-react-class';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Map, Seq } from '../../../../';
-const defs = global.data;
+import getGlobalData from './global';
 
-const SideBar = createClass({
+class SideBar extends Component {
   render() {
-    var type = defs.Immutable;
+    const type = getGlobalData().Immutable;
 
     return (
       <div className="sideBar">
@@ -22,11 +21,11 @@ const SideBar = createClass({
             onClick={this.props.toggleShowInGroups}
             onKeyPress={this.props.toggleShowInGroups}
           >
-            <span className={this.props.showInGroups && 'selected'}>
+            <span className={this.props.showInGroups ? 'selected' : ''}>
               Grouped
             </span>
             {' • '}
-            <span className={this.props.showInGroups || 'selected'}>
+            <span className={this.props.showInGroups ? '' : 'selected'}>
               Alphabetized
             </span>
           </div>
@@ -34,11 +33,11 @@ const SideBar = createClass({
             onClick={this.props.toggleShowInherited}
             onKeyPress={this.props.toggleShowInherited}
           >
-            <span className={this.props.showInherited && 'selected'}>
+            <span className={this.props.showInherited ? 'selected' : ''}>
               Inherited
             </span>
             {' • '}
-            <span className={this.props.showInherited || 'selected'}>
+            <span className={this.props.showInherited ? '' : 'selected'}>
               Defined
             </span>
           </div>
@@ -53,7 +52,7 @@ const SideBar = createClass({
         </div>
       </div>
     );
-  },
+  }
 
   renderSideBarType(typeName, type) {
     var isFocus = this.props.focus === typeName;
@@ -134,8 +133,8 @@ const SideBar = createClass({
         {members}
       </div>
     );
-  },
-});
+  }
+}
 
 function flattenSubmodules(modules, type, name) {
   modules = modules.set(name, type);

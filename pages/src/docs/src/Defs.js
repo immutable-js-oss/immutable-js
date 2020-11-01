@@ -10,7 +10,7 @@ import createClass from 'create-react-class';
 import { Link } from 'react-router-dom';
 import { Seq } from '../../../../';
 import TypeKind from '../../../lib/TypeKind';
-var defs = global.data;
+import getGlobalData from './global';
 
 export const InterfaceDef = createClass({
   render() {
@@ -190,7 +190,7 @@ export const TypeDef = createClass({
           .split('.')
           .reduce(
             (def, name) => def && def.module && def.module[name],
-            defs.Immutable
+            getGlobalData().Immutable
           );
         var typeNameElement = [
           type.qualifier && [
@@ -236,7 +236,7 @@ export const TypeDef = createClass({
   wrap(className, child) {
     return (
       <span
-        className={'t ' + className + (this.state.hover ? ' over' : ' notover')}
+        className={`t ${className} ${this.state.hover ? 'over' : 'notover'}`}
         onMouseOver={this.mouseOver}
         onFocus={this.mouseOver}
         onMouseOut={this.mouseOut}

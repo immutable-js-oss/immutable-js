@@ -5,9 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import createClass from 'create-react-class';
+import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import RouterPropTypes from 'react-router-prop-types';
 import { Seq } from '../../../../';
 import { InterfaceDef, CallSigDef } from './Defs';
 import MemberDoc from './MemberDoc';
@@ -17,7 +18,7 @@ import MarkDown from './MarkDown';
 import DocOverview from './DocOverview';
 import collectMemberGroups from '../../../lib/collectMemberGroups';
 import TypeKind from '../../../lib/TypeKind';
-const defs = global.data;
+import getGlobalData from './global';
 
 const typeDefURL =
   'https://github.com/immutable-js-oss/immutable-js/blob/master/type-definitions/Immutable.d.ts';
@@ -33,28 +34,54 @@ var Disclaimer = function() {
   );
 };
 
-var TypeDocumentation = createClass({
-  getInitialState() {
-    return {
+class TypeDocumentation extends Component {
+  static propTypes = {
+    match: RouterPropTypes.match.isRequired,
+  }
+
+  constructor(props, ...args) {
+    super(props, ...args);
+    this.state = {
       showInherited: true,
       showInGroups: true,
-    };
-  },
+    }
+  }
+
+  determineDoc() {
+    const rootDef = getGlobalData().Immutable;
+
+    if (!this.props.match) {
+      return {
+        def: rootDef,
+        name: undefined,
+        memberName: undefined,
+      };
+    }
+
+    const { name, memberName } = this.props.match.params;
+    const namePath = name ? name.split('.') : [];
+    console.log('roots!', rootDef);
+    const def = namePath.reduce(
+      (def, subName) => def && def.module && def.module[subName],
+      rootDef
+    );
+
+    return { def, name, memberName };
+  }
 
   toggleShowInGroups() {
     this.setState({ showInGroups: !this.state.showInGroups });
-  },
+  }
 
   toggleShowInherited() {
     this.setState({ showInherited: !this.state.showInherited });
-  },
+  }
 
   render() {
-    var name = this.props.name;
-    var memberName = this.props.memberName;
-    var def = this.props.def;
+    const { name, memberName, def } = this.determineDoc();
+    console.log('well uh!', def);
 
-    var memberGroups = collectMemberGroups(def && def.interface, {
+    const memberGroups = collectMemberGroups(def && def.interface, {
       showInGroups: this.state.showInGroups,
       showInherited: this.state.showInherited,
     });
@@ -89,14 +116,19 @@ var TypeDocumentation = createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 function NotFound() {
   return <div>Not found</div>;
 }
 
-var FunctionDoc = createClass({
+class FunctionDoc extends Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    def: PropTypes.object.isRequired,
+  }
+
   render() {
     var name = this.props.name;
     var def = this.props.def;
@@ -138,10 +170,17 @@ var FunctionDoc = createClass({
         <Disclaimer />
       </div>
     );
-  },
-});
+  }
+}
 
-var TypeDoc = createClass({
+class TypeDoc extends Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    def: PropTypes.object.isRequired,
+    memberName: PropTypes.string.isRequired,
+    memberGroups: PropTypes.array.isRequired,
+  }
+
   render() {
     var name = this.props.name;
     var def = this.props.def;
@@ -272,8 +311,8 @@ var TypeDoc = createClass({
         <Disclaimer />
       </div>
     );
-  },
-});
+  }
+}
 
 /**
  * Get a map from super type parameter to concrete type definition. This is
@@ -302,31 +341,33 @@ var TypeDoc = createClass({
  *     C<Z: T }
  */
 function getTypePropMap(def) {
-  var map = {};
-  def &&
-    def.extends &&
-    def.extends.forEach(e => {
-      var superModule = defs.Immutable;
-      e.name.split('.').forEach(part => {
-        superModule =
-          superModule && superModule.module && superModule.module[part];
-      });
-      var superInterface = superModule && superModule.interface;
-      if (superInterface) {
-        var interfaceMap = Seq(superInterface.typeParams)
-          .toKeyedSeq()
-          .flip()
-          .map(i => e.args[i])
-          .toObject();
-        Seq(interfaceMap).forEach((v, k) => {
-          map[e.name + '<' + k] = v;
-        });
-        var superMap = getTypePropMap(superInterface);
-        Seq(superMap).forEach((v, k) => {
-          map[k] = v.k === TypeKind.Param ? interfaceMap[v.param] : v;
-        });
-      }
+  const map = {};
+  if (!def || !def.extends) {
+    return map;
+  }
+
+  def.extends.forEach(e => {
+    let superModule = getGlobalData().Immutable;
+    e.name.split('.').forEach(part => {
+      superModule =
+        superModule && superModule.module && superModule.module[part];
     });
+    var superInterface = superModule && superModule.interface;
+    if (superInterface) {
+      var interfaceMap = Seq(superInterface.typeParams)
+        .toKeyedSeq()
+        .flip()
+        .map(i => e.args[i])
+        .toObject();
+      Seq(interfaceMap).forEach((v, k) => {
+        map[e.name + '<' + k] = v;
+      });
+      var superMap = getTypePropMap(superInterface);
+      Seq(superMap).forEach((v, k) => {
+        map[k] = v.k === TypeKind.Param ? interfaceMap[v.param] : v;
+      });
+    }
+  });
   return map;
 }
 

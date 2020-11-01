@@ -6,5 +6,14 @@
  */
 
 // TODO useless, always false
-const isMobile = window.matchMedia && window.matchMedia('(max-device-width: 680px)');
-export default (false && !!(isMobile && isMobile.matches));
+function isMobileMatch() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  if (!window.matchMedia) {
+    return false;
+  }
+  return window.matchMedia('(max-device-width: 680px)').matches;
+}
+
+export default (false && !!isMobileMatch());

@@ -5,78 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import createClass from 'create-react-class';
-import PropTypes from 'prop-types';
-
-import { Router, Route, RouteHandler } from 'react-router-dom';
+import React, { Component } from 'react';
+import { Route, Switch } from 'react-router-dom';
 import DocHeader from './DocHeader';
 import DocSearch from './DocSearch.js';
 import TypeDocumentation from './TypeDocumentation';
-const defs = global.data; // injected by gulp
-
-// TODO DO NOT MERGE: Fix the stupid router
 
 import '../../../lib/runkit-embed';
 
-var Documentation = createClass({
-  render() {
-    return (
-      <div>
-        <DocHeader />
-        <div className="pageBody" id="body">
-          <div className="contents">
-            <DocSearch />
-            <RouteHandler />
-          </div>
-        </div>
-      </div>
-    );
-  },
-});
-
-var DocDeterminer = createClass({
-  childContextTypes: {
-    router: PropTypes.object.isRequired,
-  },
-  render() {
-    var { def, name, memberName } = determineDoc(this.context.router.getCurrentPath());
-    return <TypeDocumentation def={def} name={name} memberName={memberName} />;
-  },
-});
-
-function determineDoc(path) {
-  var [, name, memberName] = path.split('/');
-
-  var namePath = name ? name.split('.') : [];
-  var def = namePath.reduce(
-    (def, subName) => def && def.module && def.module[subName],
-    defs.Immutable
-  );
-
-  return { def, name, memberName };
-}
-
-module.exports = createClass({
-  childContextTypes: {
-    getPageData: PropTypes.func.isRequired,
-  },
-
-  getChildContext() {
-    return {
-      getPageData: this.getPageData,
-    };
-  },
-
-  getPageData() {
-    return this.pageData;
-  },
-
+class App extends Component {
+  /*
   componentWillMount() {
     var location;
     var scrollBehavior;
 
-    if (window.document) {
+    if (typeof window !== "undefined" && window.document) {
       location = Router.HashLocation;
       location.addChangeListener(change => {
         this.pageData = Object.assign({}, change, determineDoc(change.path));
@@ -144,9 +87,25 @@ module.exports = createClass({
       this.pageData.type = '';
     }, 0);
   },
+   */
 
   render() {
-    var Handler = this.state.handler;
-    return <Handler />;
-  },
-});
+    return (
+      <div>
+        <DocHeader />
+        <div className="pageBody" id="body">
+          <div className="contents">
+            <DocSearch />
+            <Switch>
+              <Route exact path="/" component={TypeDocumentation} />
+              <Route path="/:name/:memberName" component={TypeDocumentation} />
+              <Route path="/:name" component={TypeDocumentation} />
+            </Switch>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;

@@ -5,16 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import createClass from 'create-react-class';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Seq } from '../../../../';
 import Markdown from './MarkDown';
+import PropTypes from 'prop-types';
 
-const DocOverview = createClass({
+class DocOverview extends Component {
+  static propTypes = {
+    def: PropTypes.object.isRequired,
+  }
+
   render() {
     var def = this.props.def;
     var doc = def.doc;
+    console.log('delkf', def);
 
     return (
       <div>
@@ -50,7 +55,7 @@ const DocOverview = createClass({
           .toArray()}
       </div>
     );
-  },
-});
+  }
+}
 
 export default DocOverview;
