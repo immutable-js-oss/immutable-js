@@ -5,44 +5,53 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import createClass from 'create-react-class';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 //var ReactTransitionEvents from 'react/lib/ReactTransitionEvents');
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Link } from 'react-router-dom';
-import { CallSigDef, MemberDef } from './Defs';
-import isMobile from './isMobile';
-import MarkDown from './MarkDown';
+import { CallSigDef, MemberDef } from '../Defs';
+import isMobile from '../isMobile';
+import MarkDown from '../MarkDown';
 
-var MemberDoc = createClass({
-  childContextTypes: {
-    getPageData: PropTypes.func.isRequired,
-  },
+export default class MemberDoc extends Component {
+  static propTypes = {
+    showDetail: PropTypes.bool.isRequired,
+    member: PropTypes.object.isRequired,
+    parentName: PropTypes.string.isRequired,
+    typePropMap: PropTypes.object,
+  }
 
-  getInitialState() {
-    var showDetail = this.props.showDetail;
-    return { detail: showDetail };
-  },
+  constructor(props, ...args) {
+    super(props, ...args);
+    this.state = {
+      detail: props.showDetail,
+    }
+  }
 
   componentDidMount() {
+    // TODO BDURRER do we really need this?
+    /*
     if (typeof window !== "undefined" && this.props.showDetail) {
       var navType = this.getPageData().type;
       if (navType === 'init' || navType === 'push') {
         window.scrollTo(window.scrollX, offsetTop(this._container) - FIXED_HEADER_HEIGHT);
       }
     }
-  },
+    */
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.showDetail && !this.props.showDetail) {
       this.scrollTo = true;
       this.setState({ detail: true });
     }
-  },
+  }
 
   componentDidUpdate() {
+    // TODO BDURRER do we really need this?
+    /*
     if (typeof window !== "undefined" && this.scrollTo) {
       this.scrollTo = false;
       var navType = this.getPageData().type;
@@ -50,7 +59,8 @@ var MemberDoc = createClass({
         window.scrollTo(window.scrollX, offsetTop(this._container) - FIXED_HEADER_HEIGHT);
       }
     }
-  },
+    */
+  }
 
   toggleDetail() {
     // Note: removed this because it drops the URL bar on mobile, and that's
@@ -65,7 +75,7 @@ var MemberDoc = createClass({
     //   this.replaceWith('/' + (typeName || '') );
     // }
     this.setState({ detail: !this.state.detail });
-  },
+  }
 
   render() {
     var typePropMap = this.props.typePropMap;
@@ -95,7 +105,7 @@ var MemberDoc = createClass({
             {(module ? module + '.' : '') + name + (isProp ? '' : '()')}
           </Link>
         </h3>
-        <TransitionGroup childFactory={makeSlideDown}>
+        <div>
           {showDetail && (
             <div key="detail" className="detail">
               {doc.synopsis && (
@@ -167,25 +177,25 @@ var MemberDoc = createClass({
               )}
             </div>
           )}
-        </TransitionGroup>
+        </div>
       </div>
     );
-  },
-});
+  }
+}
 
 function makeSlideDown(child) {
   // TODO bdurrer WORKAROUND, DO NOT MERGE LIKE THIS
   return <div>{child}</div>;
 }
 
-var SlideDown = createClass({
+class SlideDown extends Component {
   componentWillEnter(done) {
     this.slide(false, done);
-  },
+  }
 
   componentWillLeave(done) {
     this.slide(true, done);
-  },
+  }
 
   slide(slidingUp, done) {
     var node = this.getDOMNode();
@@ -204,12 +214,12 @@ var SlideDown = createClass({
     this.timeout = setTimeout(() => {
       node.style.height = end;
     }, 17);
-  },
+  }
 
   render() {
     return this.props.children;
-  },
-});
+  }
+}
 
 var FIXED_HEADER_HEIGHT = 75;
 
@@ -220,5 +230,3 @@ function offsetTop(node) {
   } while ((node = node.offsetParent));
   return top;
 }
-
-export default MemberDoc;

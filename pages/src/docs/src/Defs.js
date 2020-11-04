@@ -5,89 +5,131 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import createClass from 'create-react-class';
+import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Seq } from '../../../../';
 import TypeKind from '../../../lib/TypeKind';
 import getGlobalData from './global';
+import PropTypes from 'prop-types';
 
-export const InterfaceDef = createClass({
+export class InterfaceDef extends Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    def: PropTypes.object.isRequired,
+  }
+
   render() {
-    var name = this.props.name;
-    var def = this.props.def;
+    const name = this.props.name;
+    const def = this.props.def;
     return (
       <span className="t interfaceDef">
         <span className="t keyword">type </span>
         <span className="t typeName">{name}</span>
-        {def.typeParams && [
-          '<',
-          Seq(def.typeParams)
-            .map((t, k) => (
-              <span className="t typeParam" key={k}>
-                {t}
-              </span>
-            ))
-            .interpose(', ')
-            .toArray(),
-          '>',
-        ]}
-        {def.extends && [
-          <span className="t keyword"> extends </span>,
-          Seq(def.extends)
-            .map((e, i) => <TypeDef key={i} type={e} />)
-            .interpose(', ')
-            .toArray(),
-        ]}
-        {def.implements && [
-          <span className="t keyword"> implements </span>,
-          Seq(def.implements)
-            .map((e, i) => <TypeDef key={i} type={e} />)
-            .interpose(', ')
-            .toArray(),
-        ]}
+        {def.typeParams && (
+          <Fragment>
+            {'<'}
+            {Seq(def.typeParams)
+              .map((t, k) => (
+                <span className="t typeParam" key={k}>
+                  {t}
+                </span>
+              ))
+              .interpose(', ')
+              .toArray()}
+            {'>'}
+          </Fragment>
+        )}
+        {def.extends && (
+          <Fragment>
+            <span className="t keyword"> extends </span>,
+              {Seq(def.extends)
+              .map((e, i) => <TypeDef key={i} type={e} />)
+              .interpose(', ')
+              .toArray()}
+          </Fragment>
+        )}
+        {def.implements && (
+          <Fragment>
+            <span className="t keyword"> implements </span>,
+            {Seq(def.implements)
+              .map((e, i) => <TypeDef key={i} type={e} />)
+              .interpose(', ')
+              .toArray()}
+          </Fragment>
+        )}
       </span>
     );
-  },
-});
+  }
+}
 
 
-export const CallSigDef = createClass({
+export class CallSigDef extends Component {
+  static propTypes = {
+    info: PropTypes.object,
+    name: PropTypes.string.isRequired,
+    callSig: PropTypes.object,
+    module: PropTypes.string,
+  }
+
+  callSigLength(info, module, name, sig) {
+    return (module ? module.length + 1 : 0) + name.length + funcLength(info, sig);
+  }
+
   render() {
     var info = this.props.info;
     var module = this.props.module;
     var name = this.props.name;
     var callSig = this.props.callSig || {};
 
-    var shouldWrap = callSigLength(info, module, name, callSig) > 80;
+    var shouldWrap = this.callSigLength(info, module, name, callSig) > 80;
 
     return (
       <span className="t callSig">
-        {module && [<span className="t fnQualifier">{module}</span>, '.']}
+        {module && (
+          <Fragment>
+            <span className="t fnQualifier">{module}</span>
+            .
+          </Fragment>
+        )}
         <span className="t fnName">{name}</span>
-        {callSig.typeParams && [
-          '<',
-          Seq(callSig.typeParams)
-            .map(t => <span className="t typeParam">{t}</span>)
-            .interpose(', ')
-            .toArray(),
-          '>',
-        ]}
+        {callSig.typeParams && (
+          <Fragment>
+            {'<'}
+            {Seq(callSig.typeParams)
+              .map((t,i) => <span key={i} className="t typeParam">{t}</span>)
+              .interpose(', ')
+              .toArray()}
+            {'>'}
+          </Fragment>
+        )}
         {'('}
         {callSig && functionParams(info, callSig.params, shouldWrap)}
         {')'}
-        {callSig.type && [': ', <TypeDef info={info} type={callSig.type} />]}
+        {callSig.type && (
+          <Fragment>
+            :
+            <TypeDef info={info} type={callSig.type} />
+          </Fragment>
+        )}
       </span>
     );
-  },
-});
+  }
+}
 
-export const TypeDef = createClass({
-  getInitialState: function(){
-    return {
+export class TypeDef extends Component {
+  static propTypes = {
+    info: PropTypes.object,
+    type: PropTypes.object.isRequired,
+    prefix: PropTypes.number,
+  }
+
+  constructor(props, ...args) {
+    super(props, ...args);
+    this.state = {
       hover: false
-    };
-  },
+    }
+  }
+
   render() {
     var info = this.props.info;
     var type = this.props.type;
@@ -110,73 +152,88 @@ export const TypeDef = createClass({
       case TypeKind.Union:
         return this.wrap('union', [
           Seq(type.types)
-            .map(t => <TypeDef info={info} type={t} />)
+            .map((t,i) => <TypeDef key={i} info={info} type={t} />)
             .interpose(' | ')
             .toArray(),
         ]);
       case TypeKind.Intersection:
-        return this.wrap('intersection', [
-          Seq(type.types)
-            .map(t => <TypeDef info={info} type={t} />)
-            .interpose(' & ')
-            .toArray(),
-        ]);
+        return this.wrap('intersection',
+          <Fragment>
+            {Seq(type.types)
+              .map(t => <TypeDef info={info} type={t} />)
+              .interpose(' & ')
+              .toArray()}
+          </Fragment>
+        );
       case TypeKind.Tuple:
-        return this.wrap('tuple', [
-          '[',
-          Seq(type.types)
-            .map(t => <TypeDef info={info} type={t} />)
-            .interpose(', ')
-            .toArray(),
-          ']',
-        ]);
+        return this.wrap('tuple',
+          <Fragment>
+            [
+            {Seq(type.types)
+              .map(t => <TypeDef info={info} type={t} />)
+              .interpose(', ')
+              .toArray()}
+            ]
+          </Fragment>
+        );
       case TypeKind.Object:
-        return this.wrap('object', [
-          '{',
-          Seq(type.members)
-            .map(t => <MemberDef member={t} />)
-            .interpose(', ')
-            .toArray(),
-          '}',
-        ]);
+        return this.wrap('object',
+          <Fragment>
+            {'{'}
+            {Seq(type.members)
+              .map(t => <MemberDef member={t} />)
+              .interpose(', ')
+              .toArray()}
+            {'}'}
+          </Fragment>
+        );
       case TypeKind.Indexed:
-        return this.wrap('indexed', [
-          <TypeDef info={info} type={type.type} />,
-          '[',
-          <TypeDef info={info} type={type.index} />,
-          ']',
-        ]);
+        return this.wrap('indexed',
+          <Fragment>
+            <TypeDef info={info} type={type.type} />,
+            [
+            <TypeDef info={info} type={type.index} />,
+            ]
+          </Fragment>
+        );
       case TypeKind.Operator:
-        return this.wrap('operator', [
-          this.wrap('primitive', type.operator),
-          ' ',
-          <TypeDef info={info} type={type.type} />,
-        ]);
+        return this.wrap('operator',
+          <Fragment>
+            {this.wrap('primitive', type.operator)}
+            {' '}
+            <TypeDef info={info} type={type.type} />
+          </Fragment>
+        );
       case TypeKind.Array:
-        return this.wrap('array', [
-          <TypeDef info={info} type={type.type} />,
-          '[]',
-        ]);
+        return this.wrap('array',
+          <Fragment>
+          <TypeDef info={info} type={type.type} />
+          []
+          </Fragment>
+        );
       case TypeKind.Function:
         var shouldWrap = (prefix || 0) + funcLength(info, type) > 78;
-        return this.wrap('function', [
-          type.typeParams && [
-            '<',
-            Seq(type.typeParams)
-              .map((t, k) => (
-                <span className="t typeParam" key={k}>
-                  {t}
-                </span>
-              ))
-              .interpose(', ')
-              .toArray(),
-            '>',
-          ],
-          '(',
-          functionParams(info, type.params, shouldWrap),
-          ') => ',
-          <TypeDef info={info} type={type.type} />,
-        ]);
+        return this.wrap('function', (
+          <Fragment>
+            {type.typeParams && (
+              <Fragment>
+                {'<'}
+                {Seq(type.typeParams)
+                  .map((t, k) => (
+                    <span className="t typeParam" key={k}>{t}</span>
+                  ))
+                  .interpose(', ')
+                  .toArray()
+                }
+                {'>'}
+              </Fragment>
+              )}
+            {'('}
+            {functionParams(info, type.params, shouldWrap)}
+            {') =>'}
+            <TypeDef info={info} type={type.type} />
+          </Fragment>
+        ));
       case TypeKind.Param:
         return info && info.propMap[info.defining + '<' + type.param] ? (
           <TypeDef type={info.propMap[info.defining + '<' + type.param]} />
@@ -192,16 +249,22 @@ export const TypeDef = createClass({
             (def, name) => def && def.module && def.module[name],
             getGlobalData().Immutable
           );
-        var typeNameElement = [
-          type.qualifier && [
-            Seq(type.qualifier)
-              .map(q => <span className="t typeQualifier">{q}</span>)
-              .interpose('.')
-              .toArray(),
-            '.',
-          ],
-          <span className="t typeName">{type.name}</span>,
-        ];
+        var typeNameElement = (
+          <Fragment>
+            {type.qualifier && (
+              Seq(type.qualifier)
+                .map(q => (
+                  <Fragment>
+                    <span className="t typeQualifier">{q}</span>
+                    .
+                  </Fragment>
+                ))
+                .toArray()
+            )}
+            <span className="t typeName">{type.name}</span>
+          </Fragment>
+
+        );
         if (def) {
           typeNameElement = (
             <Link to={'/' + qualifiedTypeName}>
@@ -209,29 +272,33 @@ export const TypeDef = createClass({
             </Link>
           );
         }
-        return this.wrap('type', [
-          typeNameElement,
-          type.args && [
-            '<',
-            Seq(type.args)
-              .map(a => <TypeDef info={info} type={a} />)
-              .interpose(', ')
-              .toArray(),
-            '>',
-          ],
-        ]);
+        return this.wrap('type',
+          <Fragment>
+            {typeNameElement}
+            {type.args && (
+              <Fragment>
+                {'<'}
+                {Seq(type.args)
+                  .map((a, i) => <TypeDef key={i} info={info} type={a} />)
+                  .interpose(', ')
+                  .toArray()}
+                {'>'}
+              </Fragment>
+            )}
+          </Fragment>
+        );
     }
     throw new Error('Unknown kind ' + type.k);
-  },
+  }
 
-  mouseOver(event) {
+  mouseOver = (event) => {
     this.setState({ hover: true });
     event.stopPropagation();
-  },
+  };
 
-  mouseOut() {
+  mouseOut = () => {
     this.setState({ hover: false });
-  },
+  };
 
   wrap(className, child) {
     return (
@@ -245,50 +312,69 @@ export const TypeDef = createClass({
         {child}
       </span>
     );
-  },
-});
+  }
+}
 
-export const MemberDef = createClass({
+export class MemberDef extends Component {
+  static propTypes = {
+    module: PropTypes.string,
+    member: PropTypes.object.isRequired,
+  }
+
   render() {
-    var module = this.props.module;
-    var member = this.props.member;
+    const module = this.props.module;
+    const member = this.props.member;
     return (
       <span className="t member">
-        {module && [<span className="t fnQualifier">{module}</span>, '.']}
+        {module && (
+          <Fragment>
+            <span className="t fnQualifier">{module}</span>
+            .
+          </Fragment>
+        )}
         {member.index ? (
-          ['[', functionParams(null, member.params), ']']
+          <Fragment>
+            [
+            {functionParams(null, member.params)}
+            ]
+          </Fragment>
         ) : (
           <span className="t memberName">{member.name}</span>
         )}
-        {member.type && [': ', <TypeDef type={member.type} />]}
+        {member.type && (
+          <Fragment>
+            :
+            <TypeDef type={member.type} />
+          </Fragment>
+        )}
       </span>
     );
-  },
-});
+  }
+}
 
 function functionParams(info, params, shouldWrap) {
-  var elements = Seq(params)
-    .map(t => [
-      t.varArgs ? '...' : null,
-      <span className="t param">{t.name}</span>,
-      t.optional ? '?: ' : ': ',
-      <TypeDef
-        prefix={t.name.length + (t.varArgs ? 3 : 0) + (t.optional ? 3 : 2)}
-        info={info}
-        type={t.type}
-      />,
-    ])
-    .interpose(shouldWrap ? [',', <br />] : ', ')
+  const elements = Seq(params)
+    .map(t => (
+      <Fragment>
+        {t.varArgs ? '...' : null}
+        <span className="t param">{t.name}</span>
+        {t.optional ? '?: ' : ': '}
+        <TypeDef
+          prefix={t.name.length + (t.varArgs ? 3 : 0) + (t.optional ? 3 : 2)}
+          info={info}
+          type={t.type}
+        />
+      </Fragment>
+    ))
+    .interpose(shouldWrap ? (<Fragment>, <br/></Fragment>) : ', ')
     .toArray();
   return shouldWrap ? (
     <div className="t blockParams">{elements}</div>
   ) : (
-    elements
+    <Fragment>
+      {elements}
+    </Fragment>
   );
-}
-
-function callSigLength(info, module, name, sig) {
-  return (module ? module.length + 1 : 0) + name.length + funcLength(info, sig);
 }
 
 function funcLength(info, sig) {

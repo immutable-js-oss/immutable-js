@@ -19,7 +19,6 @@ class DocOverview extends Component {
   render() {
     var def = this.props.def;
     var doc = def.doc;
-    console.log('delkf', def);
 
     return (
       <div>

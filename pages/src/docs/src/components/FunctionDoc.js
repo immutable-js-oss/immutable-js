@@ -1,8 +1,16 @@
-import MarkDown from './MarkDown';
-import { CallSigDef } from './Defs';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import MarkDown from '../MarkDown';
+import { CallSigDef } from '../Defs';
+import Disclaimer from './Disclaimer';
 
-class FunctionDoc extends Component {
+
+export default class FunctionDoc extends Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    def: PropTypes.object.isRequired,
+  }
+
   render() {
     var name = this.props.name;
     var def = this.props.def;
@@ -46,5 +54,3 @@ class FunctionDoc extends Component {
     );
   }
 }
-
-export default FunctionDoc;

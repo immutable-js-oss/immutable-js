@@ -68,7 +68,6 @@
     "browserify": "16.2.2",
     "child-process-promise": "^2.2.1",
     "colors": "1.2.5",
-    "create-react-class": "15.7.0",
     "del": "3.0.0",
     "dtslint": "0.1.2",
     "eslint": "4.19.1",
