@@ -6,7 +6,7 @@
  */
 
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Map, Seq } from '../../../../';
 import getGlobalData from './global';
 
@@ -63,7 +63,7 @@ class SideBar extends Component {
     var label = typeName + (isFunction ? '()' : '');
 
     if (!isFocus) {
-      label = <Link to={'/' + typeName}>{label}</Link>;
+      label = <NavLink exact to={'/' + typeName}>{label}</NavLink>;
     }
 
     var memberGroups = this.props.memberGroups;
@@ -75,9 +75,9 @@ class SideBar extends Component {
             <section>
               <h4 className="groupTitle">Construction</h4>
               <div>
-                <Link to={'/' + typeName + '/' + typeName}>
+                <NavLink exact to={'/' + typeName + '/' + typeName}>
                   {typeName + '()'}
-                </Link>
+                </NavLink>
               </div>
             </section>
           )}
@@ -88,9 +88,9 @@ class SideBar extends Component {
               {functions
                 .map((t, name) => (
                   <div key={name}>
-                    <Link to={'/' + typeName + '/' + name}>
+                    <NavLink exact to={'/' + typeName + '/' + name}>
                       {typeName + '.' + name + '()'}
-                    </Link>
+                    </NavLink>
                   </div>
                 ))
                 .valueSeq()
@@ -110,12 +110,10 @@ class SideBar extends Component {
                         </h4>,
                         Seq(members).map(member => (
                           <div key={member.memberName}>
-                            <Link
-                              to={'/' + typeName + '/' + member.memberName}
-                            >
+                            <NavLink exact to={'/' + typeName + '/' + member.memberName}>
                               {member.memberName +
-                                (member.memberDef.signatures ? '()' : '')}
-                            </Link>
+                                ((member.memberDef && member.memberDef.signatures) ? '()' : '')}
+                            </NavLink>
                           </div>
                         )),
                       ])

@@ -5,22 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { Component, Fragment } from 'react';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import RouterPropTypes from 'react-router-prop-types';
-import { Seq } from '../../../../';
-import { InterfaceDef, CallSigDef } from './Defs';
-import MemberDoc from './components/MemberDoc';
 import isMobile from './isMobile';
 import SideBar from './SideBar';
-import MarkDown from './MarkDown';
 import DocOverview from './DocOverview';
 import collectMemberGroups from '../../../lib/collectMemberGroups';
-import TypeKind from '../../../lib/TypeKind';
 import getGlobalData from './global';
 import FunctionDoc from './components/FunctionDoc';
 import TypeDoc from './components/TypeDoc';
+
+const emptyMatch = {};
+const FIXED_HEADER_HEIGHT = 75;
 
 class TypeDocumentation extends Component {
   static propTypes = {
@@ -35,10 +31,52 @@ class TypeDocumentation extends Component {
     }
   }
 
-  determineDoc(match) {
+  componentDidMount() {
+    if (this.props.match && this.props.match.params) {
+      this.scrollToElement(this.props.match.params);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('did update type doc', prevProps.match !== this.props.match);
+    const previousMatch = prevProps.match && prevProps.match.params ? prevProps.match.params : emptyMatch;
+    const thisMatch = this.props.match && this.props.match.params ? this.props.match.params : emptyMatch;
+    if (previousMatch.name !== thisMatch.name || previousMatch.memberName !== thisMatch.memberName) {
+      this.scrollToElement(thisMatch);
+    }
+  }
+
+  offsetTop(node) {
+    let top = 0;
+    do {
+      top += node.offsetTop;
+    } while ((node = node.offsetParent));
+    return top;
+  }
+
+  scrollToElement(params) {
+    if (typeof document === "undefined") {
+      // pre-rendering, skip scrolling
+      return;
+    }
+    const { name, memberName } = this.props.match.params;
+    const id = memberName ? `/${name}/${memberName}` : `/${name}`;
+    const element = document.getElementById(id);
+    if (element) {
+      //element.scrollIntoView(true);
+      console.log('scrolling to ', name, memberName, element);
+      window.scrollTo({
+        left: window.scrollX,
+        top: this.offsetTop(element) - FIXED_HEADER_HEIGHT,
+        behavior: 'auto',
+      });
+    }
+  }
+
+  determineDoc() {
     const rootDef = getGlobalData().Immutable;
 
-    if (!match) {
+    if (!this.props.match) {
       return {
         def: rootDef,
         name: undefined,
@@ -46,9 +84,9 @@ class TypeDocumentation extends Component {
       };
     }
 
-    const { name, memberName } = match.params;
+    const { name, memberName } = this.props.match.params;
     const namePath = name ? name.split('.') : [];
-    console.log('roots!', rootDef);
+    console.log('roots!', rootDef, name, memberName);
     const def = namePath.reduce(
       (def, subName) => def && def.module && def.module[subName],
       rootDef
@@ -57,16 +95,12 @@ class TypeDocumentation extends Component {
     return { def, name, memberName };
   }
 
-  toggleShowInGroups() {
-    this.setState({ showInGroups: !this.state.showInGroups });
-  }
+  toggleShowInGroups = () => this.setState({ showInGroups: !this.state.showInGroups });
 
-  toggleShowInherited() {
-    this.setState({ showInherited: !this.state.showInherited });
-  }
+  toggleShowInherited = () => this.setState({ showInherited: !this.state.showInherited });
 
   render() {
-    const { name, memberName, def } = this.determineDoc(this.props.match);
+    const { name, memberName, def } = this.determineDoc();
     const memberGroups = collectMemberGroups(def && def.interface, {
       showInGroups: this.state.showInGroups,
       showInherited: this.state.showInherited,

@@ -16,4 +16,4 @@ function isMobileMatch() {
   return window.matchMedia('(max-device-width: 680px)').matches;
 }
 
-export default (false && !!isMobileMatch());
+export default (!!isMobileMatch());

@@ -103,7 +103,6 @@
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
     "react-router-prop-types": "^1.0.5",
-    "react-transition-group": "4.4.1",
     "rimraf": "2.6.2",
     "rollup": "0.59.1",
     "rollup-plugin-buble": "0.19.2",

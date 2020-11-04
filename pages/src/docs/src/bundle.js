@@ -6,14 +6,12 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { HashRouter as Router } from 'react-router-dom';
-
-/*
-window.data = {
-  Immutable: window.Immutable
-};
-*/
-
 import App from './index';
+
+if ('scrollRestoration' in window.history) {
+  // prevent the browser from tampering with our scroll state
+  window.history.scrollRestoration = 'manual';
+}
 
 // We could use React's hydrate here. But the paths of StaticRouter match BrowserRouter, but not HashRouter, so we might end up with wrong links
 render(
