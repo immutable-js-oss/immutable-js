@@ -2702,7 +2702,7 @@ declare module Immutable {
        *
        * Converts keys to Strings.
        */
-      toJS(): Object;
+      toJS(): { [key: string]: unknown };
 
       /**
        * Shallowly converts this Keyed Seq to equivalent native JavaScript Object.
@@ -3253,7 +3253,7 @@ declare module Immutable {
        *
        * Converts keys to Strings.
        */
-      toJS(): Object;
+      toJS(): { [key: string]: unknown };
 
       /**
        * Shallowly converts this Keyed collection to equivalent native JavaScript Object.
