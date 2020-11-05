@@ -24,9 +24,6 @@
         }
       }
     ],
-    "arrow-parens": [
-      true,
-      "ban-single-arg-parens"
-    ]
+    "arrow-parens": [true, "ban-single-arg-parens"]
   }
 }

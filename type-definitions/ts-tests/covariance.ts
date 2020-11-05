@@ -5,18 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {
-  List,
-  Map,
-  OrderedMap,
-  OrderedSet,
-  Set,
-  Stack,
-} from '../../';
+import { List, Map, OrderedMap, OrderedSet, Set, Stack } from '../../';
 
-class A { x: number; }
-class B extends A { y: string; }
-class C { z: string; }
+class A {
+  x: number;
+}
+class B extends A {
+  y: string;
+}
+class C {
+  z: string;
+}
 
 // List covariance
 var listOfB: List<B> = List<B>();
@@ -33,7 +32,7 @@ declare var mapOfB: Map<string, B>;
 var mapOfA: Map<string, A> = mapOfB;
 
 // $ExpectType Map<string, B>
-mapOfA = Map({b: new B()});
+mapOfA = Map({ b: new B() });
 
 // $ExpectError
 var mapOfC: Map<string, C> = mapOfB;
@@ -59,7 +58,7 @@ var stackOfC: Stack<C> = stackOfB;
 declare var orderedMapOfB: OrderedMap<string, B>;
 var orderedMapOfA: OrderedMap<string, A> = orderedMapOfB;
 // $ExpectType OrderedMap<string, B>
-orderedMapOfA = OrderedMap({b: new B()});
+orderedMapOfA = OrderedMap({ b: new B() });
 // $ExpectError
 var orderedMapOfC: OrderedMap<string, C> = orderedMapOfB;
 

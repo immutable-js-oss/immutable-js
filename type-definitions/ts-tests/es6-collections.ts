@@ -5,10 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {
-  Map as ImmutableMap,
-  Set as ImmutableSet,
-} from '../../';
+import { Map as ImmutableMap, Set as ImmutableSet } from '../../';
 
 // Immutable.js collections
 var mapImmutable: ImmutableMap<string, number> = ImmutableMap<string, number>();

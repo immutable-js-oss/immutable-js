@@ -69,7 +69,7 @@ var CallSigDef = React.createClass({
         {callSig.typeParams && [
           '<',
           Seq(callSig.typeParams)
-            .map(t => <span className="t typeParam">{t}</span>)
+            .map((t) => <span className="t typeParam">{t}</span>)
             .interpose(', ')
             .toArray(),
           '>',
@@ -108,14 +108,14 @@ var TypeDef = React.createClass({
       case TypeKind.Union:
         return this.wrap('union', [
           Seq(type.types)
-            .map(t => <TypeDef info={info} type={t} />)
+            .map((t) => <TypeDef info={info} type={t} />)
             .interpose(' | ')
             .toArray(),
         ]);
       case TypeKind.Intersection:
         return this.wrap('intersection', [
           Seq(type.types)
-            .map(t => <TypeDef info={info} type={t} />)
+            .map((t) => <TypeDef info={info} type={t} />)
             .interpose(' & ')
             .toArray(),
         ]);
@@ -123,7 +123,7 @@ var TypeDef = React.createClass({
         return this.wrap('tuple', [
           '[',
           Seq(type.types)
-            .map(t => <TypeDef info={info} type={t} />)
+            .map((t) => <TypeDef info={info} type={t} />)
             .interpose(', ')
             .toArray(),
           ']',
@@ -132,7 +132,7 @@ var TypeDef = React.createClass({
         return this.wrap('object', [
           '{',
           Seq(type.members)
-            .map(t => <MemberDef member={t} />)
+            .map((t) => <MemberDef member={t} />)
             .interpose(', ')
             .toArray(),
           '}',
@@ -193,7 +193,7 @@ var TypeDef = React.createClass({
         var typeNameElement = [
           type.qualifier && [
             Seq(type.qualifier)
-              .map(q => <span className="t typeQualifier">{q}</span>)
+              .map((q) => <span className="t typeQualifier">{q}</span>)
               .interpose('.')
               .toArray(),
             '.',
@@ -212,7 +212,7 @@ var TypeDef = React.createClass({
           type.args && [
             '<',
             Seq(type.args)
-              .map(a => <TypeDef info={info} type={a} />)
+              .map((a) => <TypeDef info={info} type={a} />)
               .interpose(', ')
               .toArray(),
             '>',
@@ -270,7 +270,7 @@ exports.MemberDef = MemberDef;
 
 function functionParams(info, params, shouldWrap) {
   var elements = Seq(params)
-    .map(t => [
+    .map((t) => [
       t.varArgs ? '...' : null,
       <span className="t param">{t.name}</span>,
       t.optional ? '?: ' : ': ',
