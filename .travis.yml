@@ -1,7 +1,7 @@
 sudo: false
 language: node_js
 node_js:
-  - node
+  - lts/*
 
 cache: yarn
 script: npm run test:travis
