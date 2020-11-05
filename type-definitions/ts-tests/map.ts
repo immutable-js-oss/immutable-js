@@ -440,8 +440,8 @@ import { Map, List } from '../../';
   );
 
   Map<number, number>().mergeDeepWith(
-    (prev: number, next: number, key: number) => 1,
     // $ExpectError
+    (prev: number, next: number, key: number) => 1,
     Map<number, string>()
   );
 
@@ -452,8 +452,8 @@ import { Map, List } from '../../';
   );
 
   Map<string, number>().mergeDeepWith(
-    (prev: number, next: number, key: string) => 1,
     // $ExpectError
+    (prev: number, next: number, key: string) => 1,
     { a: 'a' }
   );
 
