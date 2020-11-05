@@ -7,16 +7,36 @@
 
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { Map, Seq } from '../../../../';
 import getGlobalData from './global';
 
 class SideBar extends Component {
+  static propTypes = {
+    focus: PropTypes.string,
+    memberGroups: PropTypes.object,
+    toggleShowInherited: PropTypes.func.isRequired,
+    toggleShowInGroups: PropTypes.func.isRequired,
+    selectDocVersion: PropTypes.func.isRequired,
+    showInGroups: PropTypes.bool.isRequired,
+    showInherited: PropTypes.bool.isRequired,
+  }
+
   render() {
     const type = getGlobalData().Immutable;
+    const versions = window.versions || [];
+    let defaultVersion = versions.find(v => v[1] === type.version);
+    defaultVersion = defaultVersion ? defaultVersion[0] : type.version;
 
     return (
       <div className="sideBar">
         <div className="toolBar">
+          <div className="versionSelector">
+            Doc version&nbsp;
+            <select onChange={this.props.selectDocVersion} defaultValue={defaultVersion}>
+              {versions.map(([name, tag]) => (<option value={name} key={name}>{tag}</option>))}
+            </select>
+          </div>
           <div
             onClick={this.props.toggleShowInGroups}
             onKeyPress={this.props.toggleShowInGroups}

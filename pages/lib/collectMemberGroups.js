@@ -7,9 +7,8 @@
 
 var { Seq } = require('../../');
 // Note: intentionally using raw defs, not getTypeDefs to avoid circular ref.
-var defs = require('../generated/immutable.d.json');
 
-function collectMemberGroups(interfaceDef, options) {
+function collectMemberGroups(interfaceDef, options, defs) {
   var members = {};
 
   if (interfaceDef) {

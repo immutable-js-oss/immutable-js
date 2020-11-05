@@ -6,16 +6,16 @@
  */
 
 var markdown = require('./markdown');
-var defs = require('./getTypeDefs');
 
-function genMarkdownDoc(typeDefSource) {
+function genMarkdownDoc(typeDefSource, defs) {
   return markdown(
     typeDefSource.replace(/\n[^\n]+?travis-ci.org[^\n]+?\n/, '\n'),
     {
       defs,
       typePath: ['Immutable'],
       relPath: 'docs/',
-    }
+    },
+    defs,
   );
 }
 

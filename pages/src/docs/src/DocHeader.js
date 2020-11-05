@@ -9,7 +9,7 @@ import React from 'react';
 
 import SVGSet from '../../src/SVGSet';
 import Logo from '../../src/Logo';
-const defs = global.data; // injected by gulp
+import getGlobalData from './global';
 
 function DocHeader() {
   return (
@@ -24,7 +24,7 @@ function DocHeader() {
           </a>
           <a href="./" target="_self">
             Docs (v
-            {defs.Immutable.version})
+            {getGlobalData().Immutable.version})
           </a>
           <a href="https://stackoverflow.com/questions/tagged/immutable.js?sort=votes">
             Questions

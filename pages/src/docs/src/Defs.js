@@ -170,7 +170,7 @@ export class TypeDef extends Component {
           <Fragment>
             [
             {Seq(type.types)
-              .map(t => <TypeDef info={info} type={t} />)
+              .map((t, i) => <TypeDef key={i} info={info} type={t} />)
               .interpose(', ')
               .toArray()}
             ]
@@ -181,7 +181,7 @@ export class TypeDef extends Component {
           <Fragment>
             {'{'}
             {Seq(type.members)
-              .map(t => <MemberDef member={t} />)
+              .map((t, i) => <MemberDef key={i} member={t} />)
               .interpose(', ')
               .toArray()}
             {'}'}
@@ -253,11 +253,11 @@ export class TypeDef extends Component {
           <Fragment>
             {type.qualifier && (
               Seq(type.qualifier)
-                .map(q => (
-                  <Fragment>
+                .map((q, i) => (
+                  <span key={i}>
                     <span className="t typeQualifier">{q}</span>
                     .
-                  </Fragment>
+                  </span>
                 ))
                 .toArray()
             )}
@@ -352,10 +352,12 @@ export class MemberDef extends Component {
   }
 }
 
+
+
 function functionParams(info, params, shouldWrap) {
   const elements = Seq(params)
-    .map(t => (
-      <Fragment>
+    .map((t, i) => (
+      <span key={i}>
         {t.varArgs ? '...' : null}
         <span className="t param">{t.name}</span>
         {t.optional ? '?: ' : ': '}
@@ -364,9 +366,11 @@ function functionParams(info, params, shouldWrap) {
           info={info}
           type={t.type}
         />
-      </Fragment>
+        {i + 1 < params.length && (
+          shouldWrap ? (<Fragment>, <br/></Fragment>) : ', '
+        )}
+      </span>
     ))
-    .interpose(shouldWrap ? (<Fragment>, <br/></Fragment>) : ', ')
     .toArray();
   return shouldWrap ? (
     <div className="t blockParams">{elements}</div>

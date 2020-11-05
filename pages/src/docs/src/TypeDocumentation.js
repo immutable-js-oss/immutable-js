@@ -21,6 +21,8 @@ const FIXED_HEADER_HEIGHT = 75;
 class TypeDocumentation extends Component {
   static propTypes = {
     match: RouterPropTypes.match,
+    history: RouterPropTypes.history,
+    location: RouterPropTypes.location,
   }
 
   constructor(props, ...args) {
@@ -59,7 +61,7 @@ class TypeDocumentation extends Component {
       // pre-rendering, skip scrolling
       return;
     }
-    const { name, memberName } = this.props.match.params;
+    const { name, memberName } = params;
     const id = memberName ? `/${name}/${memberName}` : `/${name}`;
     const element = document.getElementById(id);
     if (element) {
@@ -86,7 +88,6 @@ class TypeDocumentation extends Component {
 
     const { name, memberName } = this.props.match.params;
     const namePath = name ? name.split('.') : [];
-    console.log('roots!', rootDef, name, memberName);
     const def = namePath.reduce(
       (def, subName) => def && def.module && def.module[subName],
       rootDef
@@ -99,12 +100,18 @@ class TypeDocumentation extends Component {
 
   toggleShowInherited = () => this.setState({ showInherited: !this.state.showInherited });
 
+  selectDocVersion = (evt) => {
+    const docName = evt.target.value;
+    console.log('select', evt.target.value);
+    window.location = `/docs/${docName}/`;
+  };
+
   render() {
     const { name, memberName, def } = this.determineDoc();
     const memberGroups = collectMemberGroups(def && def.interface, {
       showInGroups: this.state.showInGroups,
       showInherited: this.state.showInherited,
-    });
+    }, getGlobalData());
 
     let docComponent;
     if (!def) {
@@ -130,6 +137,7 @@ class TypeDocumentation extends Component {
           <SideBar
             focus={name}
             memberGroups={memberGroups}
+            selectDocVersion={this.selectDocVersion}
             toggleShowInherited={this.toggleShowInherited}
             toggleShowInGroups={this.toggleShowInGroups}
             showInGroups={this.state.showInGroups}
