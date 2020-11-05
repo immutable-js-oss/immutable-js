@@ -10,7 +10,7 @@ import { Map, List } from '../../';
 {
   // #constructor
 
-  // $ExpectType Map<{}, {}>
+  // $ExpectType Map<unknown, unknown>
   Map();
 
   // $ExpectType Map<number, string>
@@ -23,9 +23,6 @@ import { Map, List } from '../../';
 
   // $ExpectType Map<string, number>
   Map({ a: 1 });
-
-  // $ExpectError - TypeScript does not support Lists as tuples
-  Map(List([List(['a', 'b'])]));
 
   // $ExpectError
   const invalidNumberMap: Map<number, number> = Map();
@@ -51,7 +48,7 @@ import { Map, List } from '../../';
   Map<number, number>().get(4, 'a');
 
   // $ExpectError
-  Map<number, number>().get<number, number>(4, 'a');
+  Map<number, number>().get<number>(4, 'a');
 }
 
 {
@@ -399,7 +396,7 @@ import { Map, List } from '../../';
 
   // $ExpectType Map<number, string | number>
   Map<number, number | string>().mergeWith(
-    (prev: number, next: string, key: number) => 1,
+    (prev: number | string, next: number | string, key: number) => 1,
     Map<number, string>()
   );
 }
@@ -438,7 +435,7 @@ import { Map, List } from '../../';
 
   // $ExpectType Map<number, number>
   Map<number, number>().mergeDeepWith(
-    (prev: number, next: number, key: number) => 1,
+    (prev: unknown, next: unknown, key: unknown) => 1,
     Map<number, number>()
   );
 
@@ -450,7 +447,7 @@ import { Map, List } from '../../';
 
   // $ExpectType Map<string, number>
   Map<string, number>().mergeDeepWith(
-    (prev: number, next: number, key: string) => 1,
+    (prev: unknown, next: unknown, key: unknown) => 1,
     { a: 1 }
   );
 
@@ -462,7 +459,7 @@ import { Map, List } from '../../';
 
   // $ExpectType Map<number, string | number>
   Map<number, number | string>().mergeDeepWith(
-    (prev: number, next: string, key: number) => 1,
+    (prev: unknown, next: unknown, key: unknown) => 1,
     Map<number, string>()
   );
 }

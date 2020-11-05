@@ -21,10 +21,10 @@ import {
 {
   // #constructor
 
-  // $ExpectType List<any>
+  // $ExpectType List<unknown>
   List();
 
-  const numberList: List<number> = List();
+  const numberList: List<number> = List<number>();
   const numberOrStringList: List<number | string> = List([1, 'a']);
 
   // $ExpectError
@@ -415,13 +415,13 @@ import {
 {
   // #flatten
 
-  // $ExpectType Collection<any, any>
+  // $ExpectType Collection<unknown, unknown>
   List<number>().flatten();
 
-  // $ExpectType Collection<any, any>
+  // $ExpectType Collection<unknown, unknown>
   List<number>().flatten(10);
 
-  // $ExpectType Collection<any, any>
+  // $ExpectType Collection<unknown, unknown>
   List<number>().flatten(false);
 
   // $ExpectError

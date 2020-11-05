@@ -768,10 +768,10 @@ declare module Immutable {
    * but since Immutable Map keys can be of any type the argument to `get()` is
    * not altered.
    */
+  export function Map(): Map<unknown, unknown>;
+  export function Map<K, V>(): Map<K, V>;
   export function Map<K, V>(collection: Iterable<[K, V]>): Map<K, V>;
   export function Map<V>(obj: { [key: string]: V }): Map<string, V>;
-  export function Map<K, V>(): Map<K, V>;
-  export function Map(): Map<unknown, unknown>;
 
   export interface Map<K, V> extends Collection.Keyed<K, V> {
     /**
@@ -1445,14 +1445,14 @@ declare module Immutable {
    * Note: `OrderedMap` is a factory function and not a class, and does not use
    * the `new` keyword during construction.
    */
+  export function OrderedMap(): OrderedMap<unknown, unknown>;
+  export function OrderedMap<K, V>(): OrderedMap<K, V>;
   export function OrderedMap<K, V>(
     collection: Iterable<[K, V]>
   ): OrderedMap<K, V>;
   export function OrderedMap<V>(obj: {
     [key: string]: V;
   }): OrderedMap<string, V>;
-  export function OrderedMap<K, V>(): OrderedMap<K, V>;
-  export function OrderedMap(): OrderedMap<unknown, unknown>;
 
   export interface OrderedMap<K, V> extends Map<K, V> {
     /**
@@ -2429,7 +2429,7 @@ declare module Immutable {
      * Record.getDescriptiveName(me) // "Person"
      * ```
      */
-    export function getDescriptiveName(record: Record<{}>): string;
+    export function getDescriptiveName(record: Record<any>): string;
 
     /**
      * A Record.Factory is created by the `Record()` function. Record instances
@@ -2769,7 +2769,7 @@ declare module Immutable {
        *
        * Converts keys to Strings.
        */
-      toJS(): Object;
+      toJS(): { [key: string]: unknown };
 
       /**
        * Shallowly converts this Keyed Seq to equivalent native JavaScript Object.
@@ -3341,7 +3341,7 @@ declare module Immutable {
        *
        * Converts keys to Strings.
        */
-      toJS(): Object;
+      toJS(): { [key: string]: unknown };
 
       /**
        * Shallowly converts this Keyed collection to equivalent native JavaScript Object.
