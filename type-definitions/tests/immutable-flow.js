@@ -978,12 +978,12 @@ numberStack = Stack(['a']).flatten();
 {
   const stringSequence: IndexedSeq<string> = Repeat('a', 5);
 }
-// $ExpectError
 {
+  // $ExpectError
   const stringSequence: IndexedSeq<string> = Repeat(0, 1);
 }
-// $ExpectError
 {
+  // $ExpectError
   const stringSequence: IndexedSeq<string> = Range(0, 0, 0);
 }
 
@@ -1005,12 +1005,12 @@ const makePersonRecord: RecordFactory<PersonRecordFields> = Record({
 
 const personRecordInstance: PersonRecord = makePersonRecord({ age: 25 });
 
-// $ExpectError
 {
+  // $ExpectError
   const age: string = personRecordInstance.get('age');
 }
-// $ExpectError
 {
+  // $ExpectError
   const age: string = personRecordInstance.age;
 }
 {
@@ -1045,12 +1045,12 @@ let mapOfSomeObjMistake: Map<string, string> = Map(someObj);
 // Deep nested
 const deepData1: List<Map<string, string>> = List([Map([['apple', 'sauce']])]);
 const deepNestedString1 = deepData1.getIn([0, 'apple']);
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = deepNestedString1;
 }
-// $ExpectError getIn can return undefined
 {
+  // $ExpectError getIn can return undefined
   const fail: string = deepNestedString1;
 }
 {
@@ -1059,12 +1059,12 @@ const deepNestedString1 = deepData1.getIn([0, 'apple']);
 
 const listOfListOfNumber: List<?List<?number>> = List([List([1, 2, 3])]);
 const nestedNum = listOfListOfNumber.getIn([0, 1]);
-// $ExpectError number is not string
 {
+  // $ExpectError number is not string
   const fail: ?string = nestedNum;
 }
-// $ExpectError getIn can return undefined
 {
+  // $ExpectError getIn can return undefined
   const fail: number = nestedNum;
 }
 {
@@ -1082,12 +1082,12 @@ const deepData: List<Map<string, List<string>>> = List([
   Map([['apple', List(['sauce'])]]),
 ]);
 const deepNestedString = deepData.getIn([0, 'apple', 0]);
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = deepNestedString;
 }
-// $ExpectError getIn can return undefined
 {
+  // $ExpectError getIn can return undefined
   const fail: string = deepNestedString;
 }
 {
@@ -1101,12 +1101,12 @@ deepData.getIn([0, 'apple', 'whoops']);
 // Containing Records
 const listOfPersonRecord: List<PersonRecord> = List([personRecordInstance]);
 const firstAge = listOfPersonRecord.getIn([0, 'age']);
-// $ExpectError expected a string key
 {
+  // $ExpectError expected a string key
   const age: string = firstAge;
 }
-// $ExpectError getIn can return undefined
 {
+  // $ExpectError getIn can return undefined
   const age: number = firstAge;
 }
 {
@@ -1134,8 +1134,8 @@ const makePersonRecord2: RecordFactory<PersonRecord2Fields> = Record({
   friends: List(),
 });
 const friendly: PersonRecord2 = makePersonRecord2();
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = friendly.getIn(['friends', 0, 'name']);
 }
 // notSetValue provided
@@ -1148,8 +1148,8 @@ const friendly: PersonRecord2 = makePersonRecord2();
 
 // Functional API
 
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = getIn(friendly, ['friends', 0, 'name']);
 }
 // notSetValue provided
@@ -1162,8 +1162,8 @@ const friendly: PersonRecord2 = makePersonRecord2();
 
 // Deep nested containing recursive Records
 const friendlies: List<PersonRecord2> = List([makePersonRecord2()]);
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = friendlies.getIn([0, 'friends', 0, 'name']);
 }
 // notSetValue provided
@@ -1190,20 +1190,20 @@ type PlainPerson = { name: string, friends: Array<PlainPerson> };
 const plainFriendly: PlainPerson = { name: 'Bobbie', friends: [] };
 const plainFriendlies: List<PlainPerson> = List([plainFriendly]);
 
-// $ExpectError 'fraaands' is an unknown key in PlainPerson
 {
+  // $ExpectError 'fraaands' is an unknown key in PlainPerson
   const fail: ?number = plainFriendlies.getIn([0, 'fraaands', 0, 'name']);
 }
-// $ExpectError 0 is an unknown key in PlainPerson
 {
+  // $ExpectError 0 is an unknown key in PlainPerson
   const fail: ?number = plainFriendlies.getIn([0, 'fraaands', 0, 0]);
 }
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = plainFriendlies.getIn([0, 'friends', 0, 'name']);
 }
-// $ExpectError can return undefined
 {
+  // $ExpectError can return undefined
   const fail: string = plainFriendlies.getIn([0, 'friends', 0, 'name']);
 }
 {
@@ -1214,8 +1214,8 @@ const plainFriendlies: List<PlainPerson> = List([plainFriendly]);
 plainFriendlies.setIn([0, 'friends', 0, 'name'], 123);
 plainFriendlies.setIn([0, 'friends', 0, 'name'], 'Morgan');
 
-// $ExpectError value is a string, this is an unknown function
 plainFriendlies.updateIn([0, 'friends', 0, 'name'], (value) =>
+  // $ExpectError value is a string, this is an unknown function
   value.unknownFunction()
 );
 plainFriendlies.updateIn([0, 'friends', 0, 'name'], (value) =>
@@ -1228,20 +1228,20 @@ plainFriendlies.updateIn([0, 'friends', 0, 'name'], () => 'Whitney');
 
 // Functional API
 
-// $ExpectError 'fraaands' is an unknown key in PlainPerson
 {
+  // $ExpectError 'fraaands' is an unknown key in PlainPerson
   const fail: ?number = getIn(plainFriendlies, [0, 'fraaands', 0, 'name']);
 }
-// $ExpectError 0 is an unknown key in PlainPerson
 {
+  // $ExpectError 0 is an unknown key in PlainPerson
   const fail: ?number = getIn(plainFriendlies, [0, 'fraaands', 0, 0]);
 }
-// $ExpectError string is not a number
 {
+  // $ExpectError string is not a number
   const fail: ?number = getIn(plainFriendlies, [0, 'friends', 0, 'name']);
 }
-// $ExpectError can return undefined
 {
+  // $ExpectError can return undefined
   const fail: string = getIn(plainFriendlies, [0, 'friends', 0, 'name']);
 }
 {
@@ -1252,8 +1252,8 @@ plainFriendlies.updateIn([0, 'friends', 0, 'name'], () => 'Whitney');
 setIn(plainFriendlies, [0, 'friends', 0, 'name'], 123);
 setIn(plainFriendlies, [0, 'friends', 0, 'name'], 'Morgan');
 
-// $ExpectError value is a string, this is an unknown function
 updateIn(plainFriendlies, [0, 'friends', 0, 'name'], (value) =>
+  // $ExpectError value is a string, this is an unknown function
   value.unknownFunction()
 );
 updateIn(plainFriendlies, [0, 'friends', 0, 'name'], (value) =>
@@ -1272,16 +1272,16 @@ updateIn(plainFriendlies, [0, 'friends', 0, 'name'], () => 'Whitney');
 {
   const success: number | string = get([1, 2, 3], 0, 'missing');
 }
-// $ExpectError - string is not an array index
 {
+  // $ExpectError - string is not an array index
   const success: number = get([1, 2, 3], 'z');
 }
 // Note: does not return null since x is known to exist in {x,y}
 {
   const success: number = get({ x: 10, y: 10 }, 'x');
 }
-// $ExpectError - z is not in {x,y}
 {
+  // $ExpectError - z is not in {x,y}
   const success: number | void = get({ x: 10, y: 10 }, 'z');
 }
 {

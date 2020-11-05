@@ -99,8 +99,8 @@ const origin: PointNew = MakePointNew();
 {
   const x: number = origin.x;
 }
-// $ExpectError number is not a string
 {
+  // $ExpectError number is not a string
   const x: string = origin.x;
 }
 // Can use the Record constructor type as an alternative,
@@ -110,8 +110,8 @@ const originAlt1: MakePointNew = MakePointNew();
 {
   const x: number = originAlt1.get('x');
 }
-// $ExpectError cannot use property access for this alternative annotation
 {
+  // $ExpectError cannot use property access for this alternative annotation
   const x: number = originAlt1.x;
 }
 // Can also sort of use the inner Record values type as an alternative,
@@ -120,8 +120,8 @@ const originAlt1: MakePointNew = MakePointNew();
 // Remember that Records are *read only*, and using the $ReadOnly helper type
 // can ensure correct types.
 const originAlt2: $ReadOnly<TPointNew> = MakePointNew();
-// $ExpectError cannot use Record API for this alternative annotation
 {
+  // $ExpectError cannot use Record API for this alternative annotation
   const x: number = originAlt2.get('x');
 }
 {
@@ -138,8 +138,8 @@ const originNew: MakePointNew = new MakePointNew();
 {
   const x: number = originNew.get('x');
 }
-// $ExpectError property `x`. Property not found in RecordInstance
 {
+  // $ExpectError property `x`. Property not found in RecordInstance
   const x: number = originNew.x;
 }
 
