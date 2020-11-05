@@ -118,28 +118,28 @@ import { Set, Map } from '../../';
     (value: number, key: number, iter: Set<number>) => 1
   );
 
-  // $ExpectError
   Set<number>().map<string>(
+    // $ExpectError
     (value: number, key: number, iter: Set<number>) => 1
   );
 
-  // $ExpectError
   Set<number>().map<number>(
+    // $ExpectError
     (value: string, key: number, iter: Set<number>) => 1
   );
 
-  // $ExpectError
   Set<number>().map<number>(
+    // $ExpectError
     (value: number, key: string, iter: Set<number>) => 1
   );
 
-  // $ExpectError
   Set<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: Set<string>) => 1
   );
 
-  // $ExpectError
   Set<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: Set<number>) => 'a'
   );
 }
@@ -160,28 +160,28 @@ import { Set, Map } from '../../';
     (value: number, key: number, iter: Set<number>) => [1]
   );
 
-  // $ExpectError
   Set<number>().flatMap<string>(
+    // $ExpectError
     (value: number, key: number, iter: Set<number>) => [1]
   );
 
-  // $ExpectError
   Set<number>().flatMap<number>(
+    // $ExpectError
     (value: string, key: number, iter: Set<number>) => [1]
   );
 
-  // $ExpectError
   Set<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: string, iter: Set<number>) => [1]
   );
 
-  // $ExpectError
   Set<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: Set<string>) => [1]
   );
 
-  // $ExpectError
   Set<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: Set<number>) => ['a']
   );
 }

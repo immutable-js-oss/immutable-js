@@ -158,28 +158,28 @@ import { Stack } from '../../';
     (value: number, key: number, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().map<string>(
+    // $ExpectError
     (value: number, key: number, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().map<number>(
+    // $ExpectError
     (value: string, key: number, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().map<number>(
+    // $ExpectError
     (value: number, key: string, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: Stack<string>) => 1
   );
 
-  // $ExpectError
   Stack<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: Stack<number>) => 'a'
   );
 }
@@ -202,28 +202,28 @@ import { Stack } from '../../';
     (value: number, key: number, iter: Stack<number>) => [1]
   );
 
-  // $ExpectError
   Stack<number>().flatMap<string>(
+    // $ExpectError
     (value: number, key: number, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().flatMap<number>(
+    // $ExpectError
     (value: string, key: number, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: string, iter: Stack<number>) => 1
   );
 
-  // $ExpectError
   Stack<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: Stack<string>) => 1
   );
 
-  // $ExpectError
   Stack<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: Stack<number>) => 'a'
   );
 }

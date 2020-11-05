@@ -306,28 +306,28 @@ import {
     (value: number, key: number, iter: List<number>) => 1
   );
 
-  // $ExpectError
   List<number>().map<string>(
+    // $ExpectError
     (value: number, key: number, iter: List<number>) => 1
   );
 
-  // $ExpectError
   List<number>().map<number>(
+    // $ExpectError
     (value: string, key: number, iter: List<number>) => 1
   );
 
-  // $ExpectError
   List<number>().map<number>(
+    // $ExpectError
     (value: number, key: string, iter: List<number>) => 1
   );
 
-  // $ExpectError
   List<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: List<string>) => 1
   );
 
-  // $ExpectError
   List<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: List<number>) => 'a'
   );
 }
@@ -353,28 +353,28 @@ import {
     (value: number, key: number, iter: List<number>) => [1]
   );
 
-  // $ExpectError
   List<number>().flatMap<string>(
+    // $ExpectError
     (value: number, key: number, iter: List<number>) => [1]
   );
 
-  // $ExpectError
   List<number>().flatMap<number>(
+    // $ExpectError
     (value: string, key: number, iter: List<number>) => [1]
   );
 
-  // $ExpectError
   List<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: string, iter: List<number>) => [1]
   );
 
-  // $ExpectError
   List<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: List<string>) => [1]
   );
 
-  // $ExpectError
   List<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: List<number>) => ['a']
   );
 }

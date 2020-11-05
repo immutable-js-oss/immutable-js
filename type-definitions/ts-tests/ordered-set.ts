@@ -125,28 +125,28 @@ import { OrderedSet, Map } from '../../';
     (value: number, key: number, iter: OrderedSet<number>) => 1
   );
 
-  // $ExpectError
   OrderedSet<number>().map<string>(
+    // $ExpectError
     (value: number, key: number, iter: OrderedSet<number>) => 1
   );
 
-  // $ExpectError
   OrderedSet<number>().map<number>(
+    // $ExpectError
     (value: string, key: number, iter: OrderedSet<number>) => 1
   );
 
-  // $ExpectError
   OrderedSet<number>().map<number>(
+    // $ExpectError
     (value: number, key: string, iter: OrderedSet<number>) => 1
   );
 
-  // $ExpectError
   OrderedSet<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: OrderedSet<string>) => 1
   );
 
-  // $ExpectError
   OrderedSet<number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: OrderedSet<number>) => 'a'
   );
 }
@@ -169,28 +169,28 @@ import { OrderedSet, Map } from '../../';
     (value: number, key: number, iter: OrderedSet<number>) => [1]
   );
 
-  // $ExpectError
   OrderedSet<number>().flatMap<string>(
+    // $ExpectError
     (value: number, key: number, iter: OrderedSet<number>) => [1]
   );
 
-  // $ExpectError
   OrderedSet<number>().flatMap<number>(
+    // $ExpectError
     (value: string, key: number, iter: OrderedSet<number>) => [1]
   );
 
-  // $ExpectError
   OrderedSet<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: string, iter: OrderedSet<number>) => [1]
   );
 
-  // $ExpectError
   OrderedSet<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: OrderedSet<string>) => [1]
   );
 
-  // $ExpectError
   OrderedSet<number>().flatMap<number>(
+    // $ExpectError
     (value: number, key: number, iter: OrderedSet<number>) => ['a']
   );
 }

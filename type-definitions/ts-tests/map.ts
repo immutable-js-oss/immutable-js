@@ -197,28 +197,28 @@ import { Map, List } from '../../';
     (value: number, key: number, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().map<string>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().map<number>(
+    // $ExpectError
     (value: string, key: number, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().map<number>(
+    // $ExpectError
     (value: number, key: string, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, string>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().map<number>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, number>) => 'a'
   );
 }
@@ -241,28 +241,28 @@ import { Map, List } from '../../';
     (value: number, key: number, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().mapKeys<string>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().mapKeys<number>(
+    // $ExpectError
     (value: string, key: number, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().mapKeys<number>(
+    // $ExpectError
     (value: number, key: string, iter: Map<number, number>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().mapKeys<number>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, string>) => 1
   );
 
-  // $ExpectError
   Map<number, number>().mapKeys<number>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, number>) => 'a'
   );
 }
@@ -291,28 +291,28 @@ import { Map, List } from '../../';
     (value: number, key: number, iter: Map<number, number>) => [[0, 1]]
   );
 
-  // $ExpectError
   Map<number, number>().flatMap<number, string>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, number>) => [[0, 1]]
   );
 
-  // $ExpectError
   Map<number, number>().flatMap<number, number>(
+    // $ExpectError
     (value: string, key: number, iter: Map<number, number>) => [[0, 1]]
   );
 
-  // $ExpectError
   Map<number, number>().flatMap<number, number>(
+    // $ExpectError
     (value: number, key: string, iter: Map<number, number>) => [[0, 1]]
   );
 
-  // $ExpectError
   Map<number, number>().flatMap<number, number>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, string>) => [[0, 1]]
   );
 
-  // $ExpectError
   Map<number, number>().flatMap<number, number>(
+    // $ExpectError
     (value: number, key: number, iter: Map<number, number>) => [[0, 'a']]
   );
 }
@@ -355,33 +355,33 @@ import { Map, List } from '../../';
     Map<number, number>()
   );
 
-  // $ExpectError
   Map<number, number>().mergeWith(
+    // $ExpectError
     (prev: string, next: number, key: number) => 1,
     Map<number, number>()
   );
 
-  // $ExpectError
   Map<number, number>().mergeWith(
+    // $ExpectError
     (prev: number, next: string, key: number) => 1,
     Map<number, number>()
   );
 
-  // $ExpectError
   Map<number, number>().mergeWith(
+    // $ExpectError
     (prev: number, next: number, key: string) => 1,
     Map<number, number>()
   );
 
-  // $ExpectError
   Map<number, number>().mergeWith(
+    // $ExpectError
     (prev: number, next: number, key: number) => 'a',
     Map<number, number>()
   );
 
-  // $ExpectError
   Map<number, number>().mergeWith(
     (prev: number, next: number, key: number) => 1,
+    // $ExpectError
     Map<number, string>()
   );
 
@@ -391,9 +391,9 @@ import { Map, List } from '../../';
     { a: 1 }
   );
 
-  // $ExpectError
   Map<string, number>().mergeWith(
     (prev: number, next: number, key: string) => 1,
+    // $ExpectError
     { a: 'a' }
   );
 
@@ -442,9 +442,9 @@ import { Map, List } from '../../';
     Map<number, number>()
   );
 
-  // $ExpectError
   Map<number, number>().mergeDeepWith(
     (prev: number, next: number, key: number) => 1,
+    // $ExpectError
     Map<number, string>()
   );
 
@@ -454,9 +454,9 @@ import { Map, List } from '../../';
     { a: 1 }
   );
 
-  // $ExpectError
   Map<string, number>().mergeDeepWith(
     (prev: number, next: number, key: string) => 1,
+    // $ExpectError
     { a: 'a' }
   );
 
