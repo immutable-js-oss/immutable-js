@@ -23,14 +23,14 @@ class TypeDocumentation extends Component {
     match: RouterPropTypes.match,
     history: RouterPropTypes.history,
     location: RouterPropTypes.location,
-  }
+  };
 
   constructor(props, ...args) {
     super(props, ...args);
     this.state = {
       showInherited: true,
       showInGroups: true,
-    }
+    };
   }
 
   componentDidMount() {
@@ -41,9 +41,18 @@ class TypeDocumentation extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     console.log('did update type doc', prevProps.match !== this.props.match);
-    const previousMatch = prevProps.match && prevProps.match.params ? prevProps.match.params : emptyMatch;
-    const thisMatch = this.props.match && this.props.match.params ? this.props.match.params : emptyMatch;
-    if (previousMatch.name !== thisMatch.name || previousMatch.memberName !== thisMatch.memberName) {
+    const previousMatch =
+      prevProps.match && prevProps.match.params
+        ? prevProps.match.params
+        : emptyMatch;
+    const thisMatch =
+      this.props.match && this.props.match.params
+        ? this.props.match.params
+        : emptyMatch;
+    if (
+      previousMatch.name !== thisMatch.name ||
+      previousMatch.memberName !== thisMatch.memberName
+    ) {
       this.scrollToElement(thisMatch);
     }
   }
@@ -57,7 +66,7 @@ class TypeDocumentation extends Component {
   }
 
   scrollToElement(params) {
-    if (typeof document === "undefined") {
+    if (typeof document === 'undefined') {
       // pre-rendering, skip scrolling
       return;
     }
@@ -96,9 +105,11 @@ class TypeDocumentation extends Component {
     return { def, name, memberName };
   }
 
-  toggleShowInGroups = () => this.setState({ showInGroups: !this.state.showInGroups });
+  toggleShowInGroups = () =>
+    this.setState({ showInGroups: !this.state.showInGroups });
 
-  toggleShowInherited = () => this.setState({ showInherited: !this.state.showInherited });
+  toggleShowInherited = () =>
+    this.setState({ showInherited: !this.state.showInherited });
 
   selectDocVersion = (evt) => {
     const docName = evt.target.value;
@@ -108,18 +119,22 @@ class TypeDocumentation extends Component {
 
   render() {
     const { name, memberName, def } = this.determineDoc();
-    const memberGroups = collectMemberGroups(def && def.interface, {
-      showInGroups: this.state.showInGroups,
-      showInherited: this.state.showInherited,
-    }, getGlobalData());
+    const memberGroups = collectMemberGroups(
+      def && def.interface,
+      {
+        showInGroups: this.state.showInGroups,
+        showInherited: this.state.showInherited,
+      },
+      getGlobalData()
+    );
 
     let docComponent;
     if (!def) {
-      docComponent = (<NotFound />);
-    } else if(!name) {
-      docComponent = (<DocOverview def={def} />);
-    } else if( !def.interface && !def.module) {
-      docComponent = (<FunctionDoc name={name} def={def.call} />);
+      docComponent = <NotFound />;
+    } else if (!name) {
+      docComponent = <DocOverview def={def} />;
+    } else if (!def.interface && !def.module) {
+      docComponent = <FunctionDoc name={name} def={def.call} />;
     } else {
       docComponent = (
         <TypeDoc

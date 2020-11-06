@@ -16,15 +16,19 @@ function markdown(content, context, defs) {
     return allMembers;
 
     function _collectAllMembersForAllTypes(defs) {
-    Seq(defs).forEach((def) => {
+      Seq(defs).forEach((def) => {
         if (def.interface) {
-          var groups = collectMemberGroups(def.interface, {
-            showInherited: true,
-          }, defs);
+          var groups = collectMemberGroups(
+            def.interface,
+            {
+              showInherited: true,
+            },
+            defs
+          );
           allMembers.set(
             def.interface,
             Seq.Keyed(
-            groups[''].map((member) => [member.memberName, member.memberDef])
+              groups[''].map((member) => [member.memberName, member.memberDef])
             ).toObject()
           );
         }
@@ -38,7 +42,7 @@ function markdown(content, context, defs) {
 
   const allMembers = collectAllMembersForAllTypes(defs);
 
-// functions come before keywords
+  // functions come before keywords
   prism.languages.insertBefore('javascript', 'keyword', {
     var: /\b(this)\b/g,
     'block-keyword': /\b(if|else|while|for|function)\b/g,
@@ -52,13 +56,13 @@ function markdown(content, context, defs) {
 
   marked.setOptions({
     xhtml: true,
-  highlight: (code) => prism.highlight(code, prism.languages.javascript),
+    highlight: (code) => prism.highlight(code, prism.languages.javascript),
   });
 
   const renderer = new marked.Renderer();
 
   const runkitRegExp = /^<!--\s*runkit:activate((.|\n)*)-->(.|\n)*$/;
-  const runkitContext = {options: '{}', activated: false};
+  const runkitContext = { options: '{}', activated: false };
 
   renderer.html = function (text) {
     const result = runkitRegExp.exec(text);
@@ -85,8 +89,8 @@ function markdown(content, context, defs) {
 
     const runItButton = runkitContext.activated
       ? '<a class="try-it" data-options="' +
-      escape(JSON.stringify(runkitContext.options)) +
-      '" onClick="runIt(this)">run it</a>'
+        escape(JSON.stringify(runkitContext.options)) +
+        '" onClick="runIt(this)">run it</a>'
       : '';
 
     runkitContext.activated = false;
@@ -121,7 +125,7 @@ function markdown(content, context, defs) {
       context.signatures &&
       PARAM_RX.test(text) &&
       context.signatures.some(
-      (sig) => sig.params && sig.params.some((param) => param.name === text)
+        (sig) => sig.params && sig.params.some((param) => param.name === text)
       )
     ) {
       return '<span class="t param">' + text + '</span>';
@@ -187,7 +191,7 @@ function markdown(content, context, defs) {
                 allMembers &&
                 allMembers.get(def.interface)[name]) ||
               undefined),
-          {module: defs}
+          { module: defs }
         )
       ) {
         return path;
@@ -215,7 +219,7 @@ function markdown(content, context, defs) {
 
   function generateMarkdown(content, context) {
     context || (context = {});
-    return content ? marked(content, {renderer, context}) : content;
+    return content ? marked(content, { renderer, context }) : content;
   }
 
   return generateMarkdown(content, context);

@@ -13,7 +13,7 @@ import TypeDocumentation from './TypeDocumentation';
 
 import '../../../lib/runkit-embed';
 
-function App () {
+function App() {
   return (
     <div>
       <DocHeader />
@@ -26,7 +26,6 @@ function App () {
             <Route path="/:name" component={TypeDocumentation} />
           </Switch>
         </div>
-
       </div>
     </div>
   );

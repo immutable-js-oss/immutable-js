@@ -7,7 +7,7 @@
 
 // TODO useless, always false
 function isMobileMatch() {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return false;
   }
   if (!window.matchMedia) {
@@ -16,4 +16,4 @@ function isMobileMatch() {
   return window.matchMedia('(max-device-width: 680px)').matches;
 }
 
-export default (!!isMobileMatch());
+export default !!isMobileMatch();

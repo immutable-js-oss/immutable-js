@@ -17,11 +17,11 @@ class StarBtn extends Component {
     super(props, ...args);
     this.state = {
       stars: null,
-    }
+    };
   }
 
   componentDidMount() {
-    loadJSON('https://api.github.com/repos/facebook/immutable-js', value => {
+    loadJSON('https://api.github.com/repos/facebook/immutable-js', (value) => {
       value &&
         value.stargazers_count &&
         this.setState({ stars: value.stargazers_count });

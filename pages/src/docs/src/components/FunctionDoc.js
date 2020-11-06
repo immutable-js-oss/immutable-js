@@ -4,12 +4,11 @@ import MarkDown from '../MarkDown';
 import { CallSigDef } from '../Defs';
 import Disclaimer from './Disclaimer';
 
-
 export default class FunctionDoc extends Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     def: PropTypes.object.isRequired,
-  }
+  };
 
   render() {
     var name = this.props.name;
@@ -29,16 +28,16 @@ export default class FunctionDoc extends Component {
           ])}
         </code>
         {doc.notes &&
-        doc.notes.map((note, i) => (
-          <section key={i}>
-            <h4 className="infoHeader">{note.name}</h4>
-            {note.name === 'alias' ? (
-              <CallSigDef name={note.body} />
-            ) : (
-              note.body
-            )}
-          </section>
-        ))}
+          doc.notes.map((note, i) => (
+            <section key={i}>
+              <h4 className="infoHeader">{note.name}</h4>
+              {note.name === 'alias' ? (
+                <CallSigDef name={note.body} />
+              ) : (
+                note.body
+              )}
+            </section>
+          ))}
         {doc.description && (
           <section>
             <h4 className="infoHeader">

@@ -15,15 +15,15 @@ function generate(defs) {
     function markdownTypes(typeDefs, path) {
       Seq(typeDefs).forEach((typeDef, typeName) => {
         var typePath = path.concat(typeName);
-        markdownDoc(typeDef.doc, {typePath});
+        markdownDoc(typeDef.doc, { typePath });
         typeDef.call &&
-        markdownDoc(typeDef.call.doc, {
-          typePath,
-          signatures: typeDef.call.signatures,
-        });
+          markdownDoc(typeDef.call.doc, {
+            typePath,
+            signatures: typeDef.call.signatures,
+          });
         if (typeDef.interface) {
-          markdownDoc(typeDef.interface.doc, {defs, typePath});
-        Seq(typeDef.interface.groups).forEach((group) =>
+          markdownDoc(typeDef.interface.doc, { defs, typePath });
+          Seq(typeDef.interface.groups).forEach((group) =>
             Seq(group.members).forEach((member, memberName) =>
               markdownDoc(member.doc, {
                 typePath: typePath.concat(memberName.slice(1)),
@@ -42,13 +42,14 @@ function generate(defs) {
       return;
     }
     doc.synopsis && (doc.synopsis = markdown(doc.synopsis, context, defs));
-    doc.description && (doc.description = markdown(doc.description, context, defs));
+    doc.description &&
+      (doc.description = markdown(doc.description, context, defs));
     doc.notes &&
-    doc.notes.forEach((note) => {
-      if (note.name !== 'alias') {
-        note.body = markdown(note.body, context, defs);
-      }
-    });
+      doc.notes.forEach((note) => {
+        if (note.name !== 'alias') {
+          note.body = markdown(note.body, context, defs);
+        }
+      });
   }
 
   return markdownDocs(defs);

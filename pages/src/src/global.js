@@ -4,7 +4,7 @@
  */
 
 export default function getGlobalData() {
-  if (typeof document === "undefined") {
+  if (typeof document === 'undefined') {
     // pre-rendering, injected by gulp
     return global.data;
   } else {

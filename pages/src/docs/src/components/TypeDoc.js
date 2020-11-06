@@ -9,15 +9,13 @@ import getGlobalData from '../global';
 import TypeKind from '../../../../lib/TypeKind';
 import Disclaimer from './Disclaimer';
 
-
 export default class TypeDoc extends Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     def: PropTypes.object.isRequired,
     memberName: PropTypes.string,
     memberGroups: PropTypes.object.isRequired,
-  }
-
+  };
 
   /**
    * Get a map from super type parameter to concrete type definition. This is
@@ -51,9 +49,9 @@ export default class TypeDoc extends Component {
       return map;
     }
 
-    def.extends.forEach(e => {
+    def.extends.forEach((e) => {
       let superModule = getGlobalData().Immutable;
-      e.name.split('.').forEach(part => {
+      e.name.split('.').forEach((part) => {
         superModule =
           superModule && superModule.module && superModule.module[part];
       });
@@ -62,7 +60,7 @@ export default class TypeDoc extends Component {
         var interfaceMap = Seq(superInterface.typeParams)
           .toKeyedSeq()
           .flip()
-          .map(i => e.args[i])
+          .map((i) => e.args[i])
           .toObject();
         Seq(interfaceMap).forEach((v, k) => {
           map[e.name + '<' + k] = v;
@@ -84,8 +82,8 @@ export default class TypeDoc extends Component {
 
     var doc = def.doc || {};
     var call = def.call;
-    var functions = Seq(def.module).filter(t => !t.interface && !t.module);
-    var types = Seq(def.module).filter(t => t.interface || t.module);
+    var functions = Seq(def.module).filter((t) => !t.interface && !t.module);
+    var types = Seq(def.module).filter((t) => t.interface || t.module);
     var interfaceDef = def.interface;
     var typePropMap = this.getTypePropMap(interfaceDef);
 
@@ -102,16 +100,16 @@ export default class TypeDoc extends Component {
         )}
 
         {doc.notes &&
-        doc.notes.map((note, i) => (
-          <section key={i}>
-            <h4 className="infoHeader">{note.name}</h4>
-            {note.name === 'alias' ? (
-              <CallSigDef name={note.body} />
-            ) : (
-              note.body
-            )}
-          </section>
-        ))}
+          doc.notes.map((note, i) => (
+            <section key={i}>
+              <h4 className="infoHeader">{note.name}</h4>
+              {note.name === 'alias' ? (
+                <CallSigDef name={note.body} />
+              ) : (
+                note.body
+              )}
+            </section>
+          ))}
 
         {doc.description && (
           <section>
@@ -130,9 +128,7 @@ export default class TypeDoc extends Component {
             {types
               .map((t, typeName) => (
                 <div key={typeName}>
-                  <Link
-                    to={'/' + (name ? name + '.' + typeName : typeName)}
-                  >
+                  <Link to={'/' + (name ? name + '.' + typeName : typeName)}>
                     {name ? name + '.' + typeName : typeName}
                   </Link>
                 </div>
@@ -179,15 +175,14 @@ export default class TypeDoc extends Component {
 
         <section>
           {Seq(memberGroups)
-            .map(
-              (members, title) =>
-                members.length === 0
-                  ? null
-                  : Seq([
+            .map((members, title) =>
+              members.length === 0
+                ? null
+                : Seq([
                     <h4 key={title || 'Members'} className="groupTitle">
                       {title || 'Members'}
                     </h4>,
-                    Seq(members).map(member => (
+                    Seq(members).map((member) => (
                       <MemberDoc
                         typePropMap={typePropMap}
                         key={member.memberName}

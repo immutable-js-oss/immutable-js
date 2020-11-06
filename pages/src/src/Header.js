@@ -12,7 +12,7 @@ import Logo from './Logo';
 import StarBtn from './StarBtn';
 
 function isMobileMatch() {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return false;
   }
   if (!window.matchMedia) {
@@ -26,13 +26,13 @@ var isMobile = isMobileMatch();
 class Header extends Component {
   static propTypes = {
     package: PropTypes.object.isRequired,
-  }
+  };
 
   constructor(props, ...args) {
     super(props, ...args);
     this.state = {
       scroll: 0,
-    }
+    };
   }
 
   componentDidMount() {
@@ -72,7 +72,12 @@ class Header extends Component {
     var sp = isMobile ? 35 : 70;
 
     return (
-      <div className="header" ref={(element) => { this._container = element; }}>
+      <div
+        className="header"
+        ref={(element) => {
+          this._container = element;
+        }}
+      >
         <div className="miniHeader">
           <div className="miniHeaderContents">
             <a href="./" target="_self" className="miniLogo">
@@ -88,7 +93,9 @@ class Header extends Component {
             <a href="https://stackoverflow.com/questions/tagged/immutable.js?sort=votes">
               Questions
             </a>
-            <a href="https://github.com/immutable-js-oss/immutable-js">GitHub</a>
+            <a href="https://github.com/immutable-js-oss/immutable-js">
+              GitHub
+            </a>
           </div>
         </div>
         <div className="coverContainer">

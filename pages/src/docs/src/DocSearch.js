@@ -5,7 +5,7 @@ class DocSearch extends Component {
     super(props, ...args);
     this.state = {
       enabled: true,
-    }
+    };
   }
 
   componentDidMount() {
@@ -17,7 +17,7 @@ class DocSearch extends Component {
       'load',
       () => {
         // Initialize Algolia search - unless we are pre-rendering.
-        if (typeof document !== "undefined" && window.docsearch) {
+        if (typeof document !== 'undefined' && window.docsearch) {
           window.docsearch({
             apiKey: '83f61f865ef4cb682e0432410c2f7809',
             indexName: 'immutable_js',

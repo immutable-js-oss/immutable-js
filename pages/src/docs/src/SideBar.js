@@ -20,12 +20,12 @@ class SideBar extends Component {
     selectDocVersion: PropTypes.func.isRequired,
     showInGroups: PropTypes.bool.isRequired,
     showInherited: PropTypes.bool.isRequired,
-  }
+  };
 
   render() {
     const type = getGlobalData().Immutable;
     const versions = window.versions || [];
-    let defaultVersion = versions.find(v => v[1] === type.version);
+    let defaultVersion = versions.find((v) => v[1] === type.version);
     defaultVersion = defaultVersion ? defaultVersion[0] : type.version;
 
     return (
@@ -33,8 +33,15 @@ class SideBar extends Component {
         <div className="toolBar">
           <div className="versionSelector">
             Doc version&nbsp;
-            <select onChange={this.props.selectDocVersion} defaultValue={defaultVersion}>
-              {versions.map(([name, tag]) => (<option value={name} key={name}>{tag}</option>))}
+            <select
+              onChange={this.props.selectDocVersion}
+              defaultValue={defaultVersion}
+            >
+              {versions.map(([name, tag]) => (
+                <option value={name} key={name}>
+                  {tag}
+                </option>
+              ))}
             </select>
           </div>
           <div
@@ -83,7 +90,11 @@ class SideBar extends Component {
     var label = typeName + (isFunction ? '()' : '');
 
     if (!isFocus) {
-      label = <NavLink exact to={'/' + typeName}>{label}</NavLink>;
+      label = (
+        <NavLink exact to={'/' + typeName}>
+          {label}
+        </NavLink>
+      );
     }
 
     var memberGroups = this.props.memberGroups;
@@ -129,9 +140,14 @@ class SideBar extends Component {
                       </h4>,
                       Seq(members).map((member) => (
                         <div key={member.memberName}>
-                          <NavLink exact to={'/' + typeName + '/' + member.memberName}>
+                          <NavLink
+                            exact
+                            to={'/' + typeName + '/' + member.memberName}
+                          >
                             {member.memberName +
-                              ((member.memberDef && member.memberDef.signatures) ? '()' : '')}
+                              (member.memberDef && member.memberDef.signatures
+                                ? '()'
+                                : '')}
                           </NavLink>
                         </div>
                       )),

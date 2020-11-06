@@ -9,4 +9,4 @@ export default function Disclaimer() {
       <a href={constants.issuesURL}>Issues</a> welcome.
     </section>
   );
-};
+}

@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 class DocOverview extends Component {
   static propTypes = {
     def: PropTypes.object.isRequired,
-  }
+  };
 
   render() {
     var def = this.props.def;
@@ -41,9 +41,7 @@ class DocOverview extends Component {
             return (
               <section key={name} className="interfaceMember">
                 <h3 className="memberLabel">
-                  <Link to={'/' + name}>
-                    {name + (isFunction ? '()' : '')}
-                  </Link>
+                  <Link to={'/' + name}>{name + (isFunction ? '()' : '')}</Link>
                 </h3>
                 {t.doc && (
                   <Markdown className="detail" contents={t.doc.synopsis} />

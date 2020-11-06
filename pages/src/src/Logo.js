@@ -12,7 +12,7 @@ class Logo extends Component {
   static propTypes = {
     opacity: PropTypes.number,
     color: PropTypes.string.isRequired,
-  }
+  };
   static defaultProps = {
     opacity: 1,
   };

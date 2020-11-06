@@ -14,7 +14,4 @@ window.data = {
 
 import App from './index';
 
-hydrate(
-  <App />,
-  document.querySelector('#app')
-);
+hydrate(<App />, document.querySelector('#app'));

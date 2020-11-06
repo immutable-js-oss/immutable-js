@@ -18,13 +18,13 @@ export default class MemberDoc extends Component {
     member: PropTypes.object.isRequired,
     parentName: PropTypes.string.isRequired,
     typePropMap: PropTypes.object,
-  }
+  };
 
   constructor(props, ...args) {
     super(props, ...args);
     this.state = {
       detail: props.showDetail,
-    }
+    };
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -58,7 +58,12 @@ export default class MemberDoc extends Component {
     var memberAnchorLink = `/${this.props.parentName}/${name}`;
 
     return (
-      <div className="interfaceMember" ref={(element) => { this._container = element; }}>
+      <div
+        className="interfaceMember"
+        ref={(element) => {
+          this._container = element;
+        }}
+      >
         <h3 className="memberLabel">
           <Link
             id={memberAnchorLink}

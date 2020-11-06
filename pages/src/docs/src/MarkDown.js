@@ -12,7 +12,7 @@ export default class MarkDown extends Component {
   static propTypes = {
     contents: PropTypes.any.isRequired,
     className: PropTypes.string,
-  }
+  };
 
   shouldComponentUpdate() {
     return false;
