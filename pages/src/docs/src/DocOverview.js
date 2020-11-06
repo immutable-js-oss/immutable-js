@@ -17,8 +17,8 @@ class DocOverview extends Component {
   };
 
   render() {
-    var def = this.props.def;
-    var doc = def.doc;
+    const def = this.props.def;
+    const doc = def.doc;
 
     return (
       <div>
@@ -41,7 +41,7 @@ class DocOverview extends Component {
             return (
               <section key={name} className="interfaceMember">
                 <h3 className="memberLabel">
-                  <Link to={'/' + name}>{name + (isFunction ? '()' : '')}</Link>
+                  <Link to={anchorLink}>{name + (isFunction ? '()' : '')}</Link>
                 </h3>
                 {t.doc && (
                   <Markdown className="detail" contents={t.doc.synopsis} />

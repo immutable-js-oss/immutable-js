@@ -11,14 +11,14 @@ const collectMemberGroups = require('./collectMemberGroups');
 
 function markdown(content, context, defs) {
   function collectAllMembersForAllTypes(defs) {
-    var allMembers = new WeakMap();
+    const allMembers = new WeakMap();
     _collectAllMembersForAllTypes(defs);
     return allMembers;
 
     function _collectAllMembersForAllTypes(defs) {
       Seq(defs).forEach((def) => {
         if (def.interface) {
-          var groups = collectMemberGroups(
+          const groups = collectMemberGroups(
             def.interface,
             {
               showInherited: true,
@@ -80,7 +80,7 @@ function markdown(content, context, defs) {
 
   renderer.code = function (code, lang, escaped) {
     if (this.options.highlight) {
-      var out = this.options.highlight(code, lang);
+      const out = this.options.highlight(code, lang);
       if (out != null && out !== code) {
         escaped = true;
         code = out;
@@ -119,7 +119,7 @@ function markdown(content, context, defs) {
   };
 
   function decorateCodeSpan(text, options) {
-    var context = options.context;
+    const context = options.context;
 
     if (
       context.signatures &&
@@ -144,9 +144,9 @@ function markdown(content, context, defs) {
         !arrEndsWith(context.typePath, method) &&
         !arrEndsWith(context.typePath.slice(0, -1), method)
       ) {
-        var path = findPath(context, method);
+        const path = findPath(context, method);
         if (path) {
-          var relPath = context.relPath || '';
+          const relPath = context.relPath || '';
           return (
             '<a target="_self" href="' +
             relPath +
@@ -168,7 +168,7 @@ function markdown(content, context, defs) {
   }
 
   function arrEndsWith(arr1, arr2) {
-    for (var ii = 1; ii <= arr2.length; ii++) {
+    for (let ii = 1; ii <= arr2.length; ii++) {
       if (arr2[arr2.length - ii] !== arr1[arr1.length - ii]) {
         return false;
       }

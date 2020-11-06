@@ -21,8 +21,6 @@ const FIXED_HEADER_HEIGHT = 75;
 class TypeDocumentation extends Component {
   static propTypes = {
     match: RouterPropTypes.match,
-    history: RouterPropTypes.history,
-    location: RouterPropTypes.location,
   };
 
   constructor(props, ...args) {
@@ -39,8 +37,7 @@ class TypeDocumentation extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('did update type doc', prevProps.match !== this.props.match);
+  componentDidUpdate(prevProps) {
     const previousMatch =
       prevProps.match && prevProps.match.params
         ? prevProps.match.params
@@ -74,8 +71,6 @@ class TypeDocumentation extends Component {
     const id = memberName ? `/${name}/${memberName}` : `/${name}`;
     const element = document.getElementById(id);
     if (element) {
-      //element.scrollIntoView(true);
-      console.log('scrolling to ', name, memberName, element);
       window.scrollTo({
         left: window.scrollX,
         top: this.offsetTop(element) - FIXED_HEADER_HEIGHT,
@@ -106,18 +101,16 @@ class TypeDocumentation extends Component {
   }
 
   toggleShowInGroups = () =>
-    this.setState({ showInGroups: !this.state.showInGroups });
+    this.setState((prevState) => ({ showInGroups: !prevState.showInGroups }));
 
   toggleShowInherited = () =>
-    this.setState({ showInherited: !this.state.showInherited });
+    this.setState((prevState) => ({ showInherited: !prevState.showInherited }));
 
   selectDocVersion = (version) => {
-    console.log('switching to version', version);
-
     if (version.isLatest) {
-      window.location = '/docs/';
+      window.location.pathname = '/docs/';
     } else {
-      window.location = `/docs/${version.docName}/`;
+      window.location.pathname = `/docs/${version.docName}/`;
     }
   };
 

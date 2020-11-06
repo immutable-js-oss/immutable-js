@@ -24,7 +24,6 @@ class SideBar extends Component {
 
   onDocVersionChanged = (evt) => {
     const index = evt.target.value;
-    console.log('selected', evt.target.value);
     const versions = window.versions || [];
     if (versions[index]) {
       this.props.selectDocVersion(versions[index]);
@@ -92,12 +91,12 @@ class SideBar extends Component {
   }
 
   renderSideBarType(typeName, type) {
-    var isFocus = this.props.focus === typeName;
-    var isFunction = !type.interface && !type.module;
-    var call = type.call;
-    var functions = Seq(type.module).filter((t) => !t.interface && !t.module);
+    const isFocus = this.props.focus === typeName;
+    const isFunction = !type.interface && !type.module;
+    const call = type.call;
+    const functions = Seq(type.module).filter((t) => !t.interface && !t.module);
 
-    var label = typeName + (isFunction ? '()' : '');
+    let label = typeName + (isFunction ? '()' : '');
 
     if (!isFocus) {
       label = (
@@ -107,9 +106,9 @@ class SideBar extends Component {
       );
     }
 
-    var memberGroups = this.props.memberGroups;
+    const memberGroups = this.props.memberGroups;
 
-    var members =
+    const members =
       !isFocus || isFunction ? null : (
         <div className="members">
           {call && (

@@ -8,7 +8,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import DocHeader from './DocHeader';
-import DocSearch from './DocSearch.js';
+import DocSearch from './DocSearch';
 import TypeDocumentation from './TypeDocumentation';
 
 import '../../../lib/runkit-embed';

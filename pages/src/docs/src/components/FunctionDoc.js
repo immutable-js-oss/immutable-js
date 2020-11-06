@@ -11,9 +11,9 @@ export default class FunctionDoc extends Component {
   };
 
   render() {
-    var name = this.props.name;
-    var def = this.props.def;
-    var doc = def.doc || {};
+    const name = this.props.name;
+    const def = this.props.def;
+    const doc = def.doc || {};
 
     return (
       <div>

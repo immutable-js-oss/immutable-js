@@ -7,7 +7,6 @@ export default function getGlobalData() {
   if (typeof document === 'undefined') {
     // pre-rendering, injected by gulp
     return global.data;
-  } else {
-    return window.data;
   }
+  return window.data;
 }

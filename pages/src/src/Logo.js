@@ -8,11 +8,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class Logo extends Component {
+export default class Logo extends Component {
   static propTypes = {
     opacity: PropTypes.number,
     color: PropTypes.string.isRequired,
   };
+
   static defaultProps = {
     opacity: 1,
   };
@@ -94,5 +95,3 @@ class Logo extends Component {
     );
   }
 }
-
-export default Logo;

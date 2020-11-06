@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var { Seq } = require('../../');
-var markdown = require('./markdown');
+const { Seq } = require('../../');
+const markdown = require('./markdown');
 
 function generate(defs) {
   function markdownDocs(defs) {
@@ -14,7 +14,7 @@ function generate(defs) {
 
     function markdownTypes(typeDefs, path) {
       Seq(typeDefs).forEach((typeDef, typeName) => {
-        var typePath = path.concat(typeName);
+        const typePath = path.concat(typeName);
         markdownDoc(typeDef.doc, { typePath });
         typeDef.call &&
           markdownDoc(typeDef.call.doc, {

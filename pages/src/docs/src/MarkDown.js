@@ -10,7 +10,8 @@ import PropTypes from 'prop-types';
 
 export default class MarkDown extends Component {
   static propTypes = {
-    contents: PropTypes.any.isRequired,
+    contents: PropTypes.oneOfType([PropTypes.string, PropTypes.node])
+      .isRequired,
     className: PropTypes.string,
   };
 

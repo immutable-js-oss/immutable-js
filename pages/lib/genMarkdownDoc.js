@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var markdown = require('./markdown');
+const markdown = require('./markdown');
 
 function genMarkdownDoc(typeDefSource, defs) {
   return markdown(

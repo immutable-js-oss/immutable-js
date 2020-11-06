@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import constants from '../constants';
 
 export default function Disclaimer() {

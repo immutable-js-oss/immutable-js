@@ -17,8 +17,7 @@ function SVGSet(props) {
 }
 
 SVGSet.propTypes = {
-  style: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  children: PropTypes.any,
+  style: PropTypes.object,
 };
 
 export default SVGSet;

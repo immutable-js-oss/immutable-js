@@ -28,6 +28,8 @@ const vm = require('vm');
 const rename = require('gulp-rename');
 const semver = require('semver');
 
+const pagesBabelConfig = require('../pages/.babelrc.json');
+
 const packageInfo = require('../package.json');
 
 function requireFresh(path) {
@@ -193,13 +195,7 @@ function gulpJS(subDir, rootFile) {
   // We don't have ourself enough to write old Javascript, so let's transform with the es2015 preset package
   const sourcePath = path.join(SRC_DIR, subDir, 'src', rootFile);
   return browserify(sourcePath, { debug: true })
-    .transform('babelify', {
-      presets: [
-        ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
-        '@babel/preset-react',
-      ],
-      plugins: ['@babel/plugin-proposal-class-properties'],
-    })
+    .transform('babelify', pagesBabelConfig)
     .bundle()
     .pipe(source(rootFile))
     .pipe(buffer())

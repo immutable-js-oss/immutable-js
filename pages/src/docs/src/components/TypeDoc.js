@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Seq } from '../../../../../';
@@ -55,9 +55,9 @@ export default class TypeDoc extends Component {
         superModule =
           superModule && superModule.module && superModule.module[part];
       });
-      var superInterface = superModule && superModule.interface;
+      const superInterface = superModule && superModule.interface;
       if (superInterface) {
-        var interfaceMap = Seq(superInterface.typeParams)
+        const interfaceMap = Seq(superInterface.typeParams)
           .toKeyedSeq()
           .flip()
           .map((i) => e.args[i])
@@ -65,7 +65,7 @@ export default class TypeDoc extends Component {
         Seq(interfaceMap).forEach((v, k) => {
           map[e.name + '<' + k] = v;
         });
-        var superMap = this.getTypePropMap(superInterface);
+        const superMap = this.getTypePropMap(superInterface);
         Seq(superMap).forEach((v, k) => {
           map[k] = v.k === TypeKind.Param ? interfaceMap[v.param] : v;
         });
@@ -75,17 +75,17 @@ export default class TypeDoc extends Component {
   }
 
   render() {
-    var name = this.props.name;
-    var def = this.props.def;
-    var memberName = this.props.memberName;
-    var memberGroups = this.props.memberGroups;
+    const name = this.props.name;
+    const def = this.props.def;
+    const memberName = this.props.memberName;
+    const memberGroups = this.props.memberGroups;
 
-    var doc = def.doc || {};
-    var call = def.call;
-    var functions = Seq(def.module).filter((t) => !t.interface && !t.module);
-    var types = Seq(def.module).filter((t) => t.interface || t.module);
-    var interfaceDef = def.interface;
-    var typePropMap = this.getTypePropMap(interfaceDef);
+    const doc = def.doc || {};
+    const call = def.call;
+    const functions = Seq(def.module).filter((t) => !t.interface && !t.module);
+    const types = Seq(def.module).filter((t) => t.interface || t.module);
+    const interfaceDef = def.interface;
+    const typePropMap = this.getTypePropMap(interfaceDef);
 
     return (
       <div>

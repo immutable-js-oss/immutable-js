@@ -34,28 +34,27 @@ export default class MemberDoc extends Component {
   }
 
   toggleDetail = (evt) => {
-    console.log('bitchus');
-    this.setState({ detail: !this.state.detail });
     evt.preventDefault();
+    this.setState((prevState) => ({ detail: !prevState.detail }));
   };
 
   render() {
-    var typePropMap = this.props.typePropMap;
-    var member = this.props.member;
-    var module = member.isStatic ? this.props.parentName : null;
-    var name = member.memberName;
-    var def = member.memberDef;
-    var doc = def.doc || {};
-    var isProp = !def.signatures;
+    const typePropMap = this.props.typePropMap;
+    const member = this.props.member;
+    const module = member.isStatic ? this.props.parentName : null;
+    const name = member.memberName;
+    const def = member.memberDef;
+    const doc = def.doc || {};
+    const isProp = !def.signatures;
 
-    var typeInfo = member.inherited && {
+    const typeInfo = member.inherited && {
       propMap: typePropMap,
       defining: member.inherited.name,
     };
 
-    var showDetail = isMobile ? this.state.detail : true;
+    const showDetail = isMobile ? this.state.detail : true;
 
-    var memberAnchorLink = `/${this.props.parentName}/${name}`;
+    const memberAnchorLink = `/${this.props.parentName}/${name}`;
 
     return (
       <div

@@ -21,9 +21,9 @@ function isMobileMatch() {
   return window.matchMedia('(max-device-width: 680px)').matches;
 }
 
-var isMobile = isMobileMatch();
+const isMobile = isMobileMatch();
 
-class Header extends Component {
+export default class Header extends Component {
   static propTypes = {
     package: PropTypes.object.isRequired,
   };
@@ -67,9 +67,9 @@ class Header extends Component {
   };
 
   render() {
-    var neg = this.state.scroll < 0;
-    var s = neg ? 0 : this.state.scroll;
-    var sp = isMobile ? 35 : 70;
+    const neg = this.state.scroll < 0;
+    const s = neg ? 0 : this.state.scroll;
+    const sp = isMobile ? 35 : 70;
 
     return (
       <div
@@ -156,7 +156,7 @@ function z(s, p) {
 }
 
 function t(y, z) {
-  var transform = 'translate3d(0, ' + y + 'px, 0) scale(' + z + ')';
+  const transform = 'translate3d(0, ' + y + 'px, 0) scale(' + z + ')';
   return {
     transform: transform,
     WebkitTransform: transform,
@@ -165,5 +165,3 @@ function t(y, z) {
     OTransform: transform,
   };
 }
-
-export default Header;
