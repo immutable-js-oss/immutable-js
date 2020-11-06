@@ -103,10 +103,11 @@ function typedefs(done) {
       fs.writeFileSync(
         '../pages/generated/versions.json',
         JSON.stringify(
-          sortedVersions.map(([docName, tag]) => [
+          sortedVersions.map(([docName, tag]) => ({
             docName,
-            /^v?(.*)/.exec(tag)[1],
-          ])
+            version: /^v?(.*)/.exec(tag)[1],
+            isLatest: tag === latestTag,
+          }))
         ),
         'utf8'
       );
@@ -150,6 +151,7 @@ function typedefs(done) {
           const defs = genTypeDefData(typeDefPath, fileSource);
           markdownDocs(defs);
           defs.Immutable.version = /^v?(.*)/.exec(tag)[1];
+          defs.Immutable.isLatestVersion = tag === latestTag;
           const contents = JSON.stringify(defs);
 
           mkdirp.sync(path.dirname(writePath));
@@ -449,7 +451,21 @@ function reactPreRender(htmlPath, assetPath) {
           assetPath || ''
         }defs/immutable${suffix}.d.jsonp"></script>`
       )
-      .replace(/<!--\s*version\s*-->/g, suffix ? suffix.substring(1) : '');
+      .replace(
+        /<!--\s*version\s*-->/g,
+        data && data.Immutable ? data.Immutable.version : ''
+      )
+      .replace(
+        /<!--\s*Script\(\s*(.*)\s*\)\s*-->/g,
+        (_, originalScriptPath) => {
+          let scriptPath = originalScriptPath;
+          if (originalScriptPath.endsWith('immutable.js') && data.Immutable) {
+            // this is the doc page for a previous release
+            scriptPath = `https://cdn.jsdelivr.net/npm/immutable@${data.Immutable.version}/dist/immutable.min.js`;
+          }
+          return `<script src="${scriptPath}"></script>`;
+        }
+      );
 
     file.contents = Buffer.from(html, enc);
     this.push(file);

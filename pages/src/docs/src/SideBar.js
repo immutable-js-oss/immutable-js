@@ -22,11 +22,21 @@ class SideBar extends Component {
     showInherited: PropTypes.bool.isRequired,
   };
 
+  onDocVersionChanged = (evt) => {
+    const index = evt.target.value;
+    console.log('selected', evt.target.value);
+    const versions = window.versions || [];
+    if (versions[index]) {
+      this.props.selectDocVersion(versions[index]);
+    }
+  };
+
   render() {
     const type = getGlobalData().Immutable;
     const versions = window.versions || [];
-    let defaultVersion = versions.find((v) => v[1] === type.version);
-    defaultVersion = defaultVersion ? defaultVersion[0] : type.version;
+    const defaultVersionIndex = versions.findIndex(
+      (v) => v.version === type.version
+    );
 
     return (
       <div className="sideBar">
@@ -34,12 +44,12 @@ class SideBar extends Component {
           <div className="versionSelector">
             Doc version&nbsp;
             <select
-              onChange={this.props.selectDocVersion}
-              defaultValue={defaultVersion}
+              onChange={this.onDocVersionChanged}
+              defaultValue={defaultVersionIndex}
             >
-              {versions.map(([name, tag]) => (
-                <option value={name} key={name}>
-                  {tag}
+              {versions.map((v, index) => (
+                <option value={index} key={v.version}>
+                  {v.version}
                 </option>
               ))}
             </select>

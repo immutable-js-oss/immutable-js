@@ -111,10 +111,14 @@ class TypeDocumentation extends Component {
   toggleShowInherited = () =>
     this.setState({ showInherited: !this.state.showInherited });
 
-  selectDocVersion = (evt) => {
-    const docName = evt.target.value;
-    console.log('select', evt.target.value);
-    window.location = `/docs/${docName}/`;
+  selectDocVersion = (version) => {
+    console.log('switching to version', version);
+
+    if (version.isLatest) {
+      window.location = '/docs/';
+    } else {
+      window.location = `/docs/${version.docName}/`;
+    }
   };
 
   render() {
