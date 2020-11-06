@@ -8,7 +8,6 @@
 import React from 'react';
 import Header from './Header';
 import readme from '../../generated/readme.json';
-console.log('readme is', readme);
 import '../../lib/runkit-embed';
 
 function Index() {

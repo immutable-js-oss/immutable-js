@@ -23,7 +23,7 @@ function generate(defs) {
         });
         if (typeDef.interface) {
           markdownDoc(typeDef.interface.doc, {defs, typePath});
-          Seq(typeDef.interface.groups).forEach(group =>
+        Seq(typeDef.interface.groups).forEach((group) =>
             Seq(group.members).forEach((member, memberName) =>
               markdownDoc(member.doc, {
                 typePath: typePath.concat(memberName.slice(1)),
@@ -44,7 +44,7 @@ function generate(defs) {
     doc.synopsis && (doc.synopsis = markdown(doc.synopsis, context, defs));
     doc.description && (doc.description = markdown(doc.description, context, defs));
     doc.notes &&
-    doc.notes.forEach(note => {
+    doc.notes.forEach((note) => {
       if (note.name !== 'alias') {
         note.body = markdown(note.body, context, defs);
       }

@@ -141,6 +141,8 @@ export class TypeDef extends Component {
         return this.wrap('primitive', 'any');
       case TypeKind.This:
         return this.wrap('primitive', 'this');
+      case TypeKind.Null:
+        return this.wrap('primitive', 'null');
       case TypeKind.Undefined:
         return this.wrap('primitive', 'undefined');
       case TypeKind.Boolean:
@@ -160,7 +162,7 @@ export class TypeDef extends Component {
         return this.wrap('intersection',
           <Fragment>
             {Seq(type.types)
-              .map(t => <TypeDef info={info} type={t} />)
+              .map((t) => <TypeDef info={info} type={t} />)
               .interpose(' & ')
               .toArray()}
           </Fragment>

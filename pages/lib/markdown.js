@@ -16,7 +16,7 @@ function markdown(content, context, defs) {
     return allMembers;
 
     function _collectAllMembersForAllTypes(defs) {
-      Seq(defs).forEach(def => {
+    Seq(defs).forEach((def) => {
         if (def.interface) {
           var groups = collectMemberGroups(def.interface, {
             showInherited: true,
@@ -24,7 +24,7 @@ function markdown(content, context, defs) {
           allMembers.set(
             def.interface,
             Seq.Keyed(
-              groups[''].map(member => [member.memberName, member.memberDef])
+            groups[''].map((member) => [member.memberName, member.memberDef])
             ).toObject()
           );
         }
@@ -52,7 +52,7 @@ function markdown(content, context, defs) {
 
   marked.setOptions({
     xhtml: true,
-    highlight: code => prism.highlight(code, prism.languages.javascript),
+  highlight: (code) => prism.highlight(code, prism.languages.javascript),
   });
 
   const renderer = new marked.Renderer();
@@ -121,7 +121,7 @@ function markdown(content, context, defs) {
       context.signatures &&
       PARAM_RX.test(text) &&
       context.signatures.some(
-        sig => sig.params && sig.params.some(param => param.name === text)
+      (sig) => sig.params && sig.params.some((param) => param.name === text)
       )
     ) {
       return '<span class="t param">' + text + '</span>';
