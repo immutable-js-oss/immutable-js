@@ -22,6 +22,7 @@
     "definition": "dist/immutable.d.ts"
   },
   "scripts": {
+    "check:all": "run-s format:check build lint test type-check",
     "build": "run-s build:*",
     "build:dist": "run-s clean:dist bundle:dist bundle:es copy:dist stats:dist",
     "build:pages": "gulp --gulpfile ./resources/gulpfile.js default",
@@ -37,7 +38,7 @@
     "format:check": "prettier --check .",
     "test": "jest",
     "type-check": "run-s type-check:*",
-    "type-check:ts": "tsc ./type-definitions/Immutable.d.ts --lib es2015 && dtslint type-definitions/ts-tests",
+    "type-check:ts": "tsc --project type-definitions/tsconfig.json && dtslint type-definitions/ts-tests",
     "type-check:flow": "flow check type-definitions/tests --include-warnings",
     "perf": "node ./resources/bench.js",
     "start": "gulp --gulpfile ./resources/gulpfile.js dev",

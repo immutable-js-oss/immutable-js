@@ -1,3 +1,4 @@
 /pages/out/**
 /pages/generated/**
 /dist/**
+node_modules
