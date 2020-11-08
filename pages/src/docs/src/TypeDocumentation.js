@@ -107,11 +107,21 @@ class TypeDocumentation extends Component {
     this.setState((prevState) => ({ showInherited: !prevState.showInherited }));
 
   selectDocVersion = (version) => {
-    if (version.isLatest) {
-      window.location.pathname = '/docs/';
-    } else {
-      window.location.pathname = `/docs/${version.docName}/`;
+    const currentVersion = getGlobalData().Immutable.version;
+    // determine path when deployed in a sub folder of the domain
+    let path = window.location.pathname.substring(
+      0,
+      window.location.pathname.indexOf('/docs/') + 5
+    );
+    if (currentVersion === version) {
+      return;
     }
+
+    if (!version.isLatest) {
+      path = `${path}/${version.docName}/`;
+    }
+
+    window.location.pathname = path;
   };
 
   render() {
