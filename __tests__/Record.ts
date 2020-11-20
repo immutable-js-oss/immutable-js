@@ -265,10 +265,9 @@ describe('Record', () => {
   it('does not accept a Record as constructor', () => {
     const Foo = Record({ foo: 'bar' });
     const fooInstance = Foo();
-    expect(() => {
-      Record(fooInstance);
-    }).toThrow(
-      'Can not use an immutable Record instance as default values for another Record factory. You may want to use a real javascript object instead.'
-    );
+    const Bar = Record(fooInstance);
+    const barInstance = Bar();
+
+    expect(barInstance.toJS()).toEqual(fooInstance.toJS());
   });
 });

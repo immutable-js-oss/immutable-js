@@ -33,12 +33,6 @@ export class Record {
   constructor(defaultValues, name) {
     let hasInitialized;
 
-    if (isRecord(defaultValues)) {
-      throw new Error(
-        'Can not use an immutable Record instance as default values for another Record factory. You may want to use a real javascript object instead.'
-      );
-    }
-
     const RecordType = function Record(values) {
       if (values instanceof RecordType) {
         return values;
@@ -48,7 +42,9 @@ export class Record {
       }
       if (!hasInitialized) {
         hasInitialized = true;
-        const keys = Object.keys(defaultValues);
+        const keys = Object.keys(
+          isRecord(defaultValues) ? defaultValues.toObject() : defaultValues
+        );
         const indices = (RecordTypePrototype._indices = {});
         // Deprecated: left to attempt not to break any external code which
         // relies on a ._name property existing on record instances.
