@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Record does not accept a non object as constructor 1`] = `"Can not call \`Record\` with a non-object as default values. You may want to use a javascript object."`;
+
+exports[`Record does not accept an immutable object that is not a Record as constructor 1`] = `"Can not call \`Record\` an immutable Collection as default values. You mant want to use a plain javascript object instead."`;
