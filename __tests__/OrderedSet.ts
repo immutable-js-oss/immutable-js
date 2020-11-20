@@ -68,8 +68,8 @@ describe('OrderedSet', () => {
   });
 
   it('ensure that `subtract` works correcly (see https://github.com/immutable-js-oss/immutable-js/issues/139 )', () => {
-    const fillArray = (capacity) =>
-      Array(capacity)
+    const fillArray = (nb) =>
+      Array(nb)
         .fill(1)
         .map((el, i) => i + 1);
 
