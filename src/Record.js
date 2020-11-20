@@ -37,13 +37,13 @@ function convertDefaultValues(defaultValues) {
 
   if (isImmutable(defaultValues)) {
     throw new Error(
-      'Can not call `Record` an immutable Collection as default values. You mant want to use a plain javascript object instead.'
+      'Can not call `Record` with an immutable Collection as default values. Use a plain javascript object instead.'
     );
   }
 
   if (defaultValues === null || typeof defaultValues !== 'object') {
     throw new Error(
-      'Can not call `Record` with a non-object as default values. You may want to use a javascript object.'
+      'Can not call `Record` with a non-object as default values. Use a plain javascript object instead.'
     );
   }
 
