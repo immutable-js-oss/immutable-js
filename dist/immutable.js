@@ -1942,12 +1942,31 @@
     );
   }
 
-  function isPlainObj(value) {
-    return (
-      value &&
-      (typeof value.constructor !== 'function' ||
-        value.constructor.name === 'Object')
-    );
+  var toString = Object.prototype.toString;
+
+  function isPlainObject(value) {
+    // The base prototype's toString deals with Argument objects and native namespaces like Math
+    if (
+      !value ||
+      typeof value !== 'object' ||
+      toString.call(value) !== '[object Object]'
+    ) {
+      return false;
+    }
+
+    var proto = Object.getPrototypeOf(value);
+    if (proto === null) {
+      return true;
+    }
+
+    // Iteratively going up the prototype chain is needed for cross-realm environments (differing contexts, iframes, etc)
+    var parentProto = proto;
+    var nextProto = Object.getPrototypeOf(proto);
+    while (nextProto !== null) {
+      parentProto = nextProto;
+      nextProto = Object.getPrototypeOf(parentProto);
+    }
+    return parentProto === proto;
   }
 
   /**
@@ -1957,7 +1976,7 @@
   function isDataStructure(value) {
     return (
       typeof value === 'object' &&
-      (isImmutable(value) || Array.isArray(value) || isPlainObj(value))
+      (isImmutable(value) || Array.isArray(value) || isPlainObject(value))
     );
   }
 
@@ -5776,7 +5795,7 @@
   function fromJSWith(stack, converter, value, key, keyPath, parentValue) {
     var toSeq = Array.isArray(value)
       ? IndexedSeq
-      : isPlainObj(value)
+      : isPlainObject(value)
       ? KeyedSeq
       : null;
     if (toSeq) {
@@ -5835,6 +5854,7 @@
     isAssociative: isAssociative,
     isOrdered: isOrdered,
     isValueObject: isValueObject,
+    isPlainObject: isPlainObject,
     isSeq: isSeq,
     isList: isList,
     isMap: isMap,
@@ -5886,6 +5906,7 @@
   exports.isIndexed = isIndexed;
   exports.isAssociative = isAssociative;
   exports.isOrdered = isOrdered;
+  exports.isPlainObject = isPlainObject;
   exports.isValueObject = isValueObject;
   exports.isSeq = isSeq;
   exports.isList = isList;

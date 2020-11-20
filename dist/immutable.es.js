@@ -1936,12 +1936,31 @@ function coerceKeyPath(keyPath) {
   );
 }
 
-function isPlainObj(value) {
-  return (
-    value &&
-    (typeof value.constructor !== 'function' ||
-      value.constructor.name === 'Object')
-  );
+var toString = Object.prototype.toString;
+
+function isPlainObject(value) {
+  // The base prototype's toString deals with Argument objects and native namespaces like Math
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    toString.call(value) !== '[object Object]'
+  ) {
+    return false;
+  }
+
+  var proto = Object.getPrototypeOf(value);
+  if (proto === null) {
+    return true;
+  }
+
+  // Iteratively going up the prototype chain is needed for cross-realm environments (differing contexts, iframes, etc)
+  var parentProto = proto;
+  var nextProto = Object.getPrototypeOf(proto);
+  while (nextProto !== null) {
+    parentProto = nextProto;
+    nextProto = Object.getPrototypeOf(parentProto);
+  }
+  return parentProto === proto;
 }
 
 /**
@@ -1951,7 +1970,7 @@ function isPlainObj(value) {
 function isDataStructure(value) {
   return (
     typeof value === 'object' &&
-    (isImmutable(value) || Array.isArray(value) || isPlainObj(value))
+    (isImmutable(value) || Array.isArray(value) || isPlainObject(value))
   );
 }
 
@@ -5770,7 +5789,7 @@ function fromJS(value, converter) {
 function fromJSWith(stack, converter, value, key, keyPath, parentValue) {
   var toSeq = Array.isArray(value)
     ? IndexedSeq
-    : isPlainObj(value)
+    : isPlainObject(value)
     ? KeyedSeq
     : null;
   if (toSeq) {
@@ -5829,6 +5848,7 @@ var Immutable = {
   isAssociative: isAssociative,
   isOrdered: isOrdered,
   isValueObject: isValueObject,
+  isPlainObject: isPlainObject,
   isSeq: isSeq,
   isList: isList,
   isMap: isMap,
@@ -5858,4 +5878,4 @@ var Immutable = {
 var Iterable = Collection;
 
 export default Immutable;
-export { version, Collection, Iterable, Seq, Map, OrderedMap, List, Stack, Set, OrderedSet, Record, Range, Repeat, is, fromJS, hash, isImmutable, isCollection, isKeyed, isIndexed, isAssociative, isOrdered, isValueObject, isSeq, isList, isMap, isOrderedMap, isStack, isSet, isOrderedSet, isRecord, get, getIn, has, hasIn, merge$1 as merge, mergeDeep, mergeWith$1 as mergeWith, mergeDeepWith, remove, removeIn, set, setIn, update, updateIn };
+export { version, Collection, Iterable, Seq, Map, OrderedMap, List, Stack, Set, OrderedSet, Record, Range, Repeat, is, fromJS, hash, isImmutable, isCollection, isKeyed, isIndexed, isAssociative, isOrdered, isPlainObject, isValueObject, isSeq, isList, isMap, isOrderedMap, isStack, isSet, isOrderedSet, isRecord, get, getIn, has, hasIn, merge$1 as merge, mergeDeep, mergeWith$1 as mergeWith, mergeDeepWith, remove, removeIn, set, setIn, update, updateIn };
