@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { isKeyed, Record, Seq } from '../';
+import { isKeyed, List, Record, Seq } from '../';
 
 describe('Record', () => {
   it('defines a constructor', () => {
@@ -252,5 +252,26 @@ describe('Record', () => {
       ['a', 10],
       ['b', 20],
     ]);
+  });
+
+  it('check that reset does reset the record. See https://github.com/immutable-js-oss/immutable-js/issues/85 ', () => {
+    type UserType = {
+      name: string;
+      roles: List<string> | Array<string>;
+    };
+
+    const User = Record<UserType>({
+      name: 'default name',
+      roles: List<string>(),
+    });
+
+    const user_0 = new User({
+      name: 'John',
+      roles: ['superuser', 'admin'],
+    });
+    const user_1 = user_0.clear();
+
+    expect(user_1.name).toBe('default name');
+    expect(user_1.roles).toEqual(List());
   });
 });
