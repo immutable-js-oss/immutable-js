@@ -7,6 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
+import * as moment from 'moment';
 import * as jasmineCheck from 'jasmine-check';
 jasmineCheck.install();
 
@@ -61,5 +62,13 @@ describe('hash', () => {
     expect(Number.isInteger(hashVal)).toBe(true);
     expect(hashVal).toBeGreaterThan(-Math.pow(2, 31));
     expect(hashVal).toBeLessThan(Math.pow(2, 31));
+  });
+
+  it('should work with moment objects', () => {
+    const now = moment();
+    console.log(now);
+
+    const nowHash = hash(now);
+    expect(typeof nowHash).toBe('number');
   });
 });
