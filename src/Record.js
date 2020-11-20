@@ -33,6 +33,12 @@ export class Record {
   constructor(defaultValues, name) {
     let hasInitialized;
 
+    if (isRecord(defaultValues)) {
+      throw new Error(
+        'Can not use an immutable Record instance as default values for another Record factory. You may want to use a real javascript object instead.'
+      );
+    }
+
     const RecordType = function Record(values) {
       if (values instanceof RecordType) {
         return values;

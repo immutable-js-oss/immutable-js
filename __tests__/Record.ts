@@ -261,4 +261,14 @@ describe('Record', () => {
     expect(factoryA().equals(factoryA())).toBe(true);
     expect(factoryA().equals(factoryB())).toBe(true);
   });
+
+  it('does not accept a Record as constructor', () => {
+    const Foo = Record({ foo: 'bar' });
+    const fooInstance = Foo();
+    expect(() => {
+      Record(fooInstance);
+    }).toThrow(
+      'Can not use an immutable Record instance as default values for another Record factory. You may want to use a real javascript object instead.'
+    );
+  });
 });
