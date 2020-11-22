@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { is, List, Seq, Set } from '../';
+import { is, List, Seq, Set } from '../src/Immutable';
 
 describe('concat', () => {
   it('concats two sequences', () => {

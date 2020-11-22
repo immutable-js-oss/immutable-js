@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const { Record } = require('../');
+const { Record } = require('../src/Immutable');
 
 describe('Record', () => {
   it('defines a record factory', () => {

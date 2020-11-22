@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { OrderedMap, Range, Seq } from '../';
+import { OrderedMap, Range, Seq } from '../src/Immutable';
 
 describe('OrderedMap', () => {
   it('converts from object', () => {

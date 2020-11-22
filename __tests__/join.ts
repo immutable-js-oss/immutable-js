@@ -10,7 +10,7 @@
 import jasmineCheck = require('jasmine-check');
 jasmineCheck.install();
 
-import { Seq } from '../';
+import { Seq } from '../src/Immutable';
 
 describe('join', () => {
   it('string-joins sequences with commas by default', () => {

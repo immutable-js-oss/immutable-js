@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { Seq } from '../';
+import { Seq } from '../src/Immutable';
 
 describe('ArraySequence', () => {
   it('every is true when predicate is true for all entries', () => {

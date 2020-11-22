@@ -54,6 +54,11 @@ function transpileJavaScript(src, path) {
 
 module.exports = {
   process(src, path) {
+    if (path.endsWith('__tests__/MultiRequire.js')) {
+      // exit early for multi-require as we explicitly want to have several instances
+      return src;
+    }
+
     if (path.endsWith('.ts') || path.endsWith('.tsx')) {
       return transpileTypeScript(src, path);
     }

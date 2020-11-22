@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { Collection, Map, Seq } from '../';
+import { Collection, Map, Seq } from '../src/Immutable';
 
 describe('groupBy', () => {
   it('groups keyed sequence', () => {

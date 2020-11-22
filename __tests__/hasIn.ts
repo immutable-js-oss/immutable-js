@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { fromJS, hasIn, List, Map } from '../';
+import { fromJS, hasIn, List, Map } from '../src/Immutable';
 
 describe('hasIn', () => {
   it('deep has', () => {

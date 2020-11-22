@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { OrderedSet } from '../';
+import { OrderedSet } from '../src/Immutable';
 
 describe('OrderedSet', () => {
   it('provides initial values in a mixed order', () => {

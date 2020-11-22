@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { Range } from '../';
+import { Range } from '../src/Immutable';
 
 describe('interpose', () => {
   it('separates with a value', () => {
