@@ -265,13 +265,20 @@ describe('Record', () => {
       roles: List<string>(),
     });
 
-    const user_0 = new User({
+    const user0 = new User({
       name: 'John',
       roles: ['superuser', 'admin'],
     });
-    const user_1 = user_0.clear();
+    const user1 = user0.clear();
 
-    expect(user_1.name).toBe('default name');
-    expect(user_1.roles).toEqual(List());
+    expect(user1.name).toBe('default name');
+    expect(user1.roles).toEqual(List());
+
+    const user2 = user0.withMutations((mutable: Record<UserType>) => {
+      mutable.clear();
+    });
+
+    expect(user2.name).toBe('default name');
+    expect(user2.roles).toEqual(List());
   });
 });
