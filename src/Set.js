@@ -82,6 +82,7 @@ export class Set extends SetCollection {
   // @pragma Composition
 
   map(mapper, context) {
+    // keep track if the set is altered by the map function
     let didChanges = false;
 
     const newMap = updateSet(
@@ -91,10 +92,9 @@ export class Set extends SetCollection {
 
         if (mapped !== v) {
           didChanges = true;
-          return [mapped, mapped];
         }
 
-        return [v, v];
+        return [mapped, mapped];
       }, context)
     );
 
