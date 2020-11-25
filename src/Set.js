@@ -82,17 +82,26 @@ export class Set extends SetCollection {
   // @pragma Composition
 
   map(mapper, context) {
-    const removes = [];
+    // const removes = [];
     const adds = [];
+    let didChanges = false;
     this.forEach((value) => {
       const mapped = mapper.call(context, value, value, this);
       if (mapped !== value) {
-        removes.push(value);
+        // removes.push(value);
         adds.push(mapped);
+        didChanges = true;
+      } else {
+        adds.push(value);
       }
     });
-    return this.withMutations((set) => {
-      removes.forEach((value) => set.remove(value));
+
+    if (!didChanges) {
+      return this;
+    }
+
+    return this.clear().withMutations((set) => {
+      // removes.forEach((value) => set.remove(value));
       adds.forEach((value) => set.add(value));
     });
   }
