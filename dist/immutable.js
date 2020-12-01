@@ -5537,10 +5537,7 @@
 
   Record.prototype.equals = function equals (other) {
     return (
-      this === other ||
-      (other &&
-        this._keys === other._keys &&
-        recordSeq(this).equals(recordSeq(other)))
+      this === other || (other && recordSeq(this).equals(recordSeq(other)))
     );
   };
 
