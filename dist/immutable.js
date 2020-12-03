@@ -5460,8 +5460,30 @@
     );
   }
 
+  function throwOnInvalidDefaultValues(defaultValues) {
+    if (isRecord(defaultValues)) {
+      throw new Error(
+        'Can not call `Record` with an immutable Record as default values. Use a plain javascript object instead.'
+      );
+    }
+
+    if (isImmutable(defaultValues)) {
+      throw new Error(
+        'Can not call `Record` with an immutable Collection as default values. Use a plain javascript object instead.'
+      );
+    }
+
+    if (defaultValues === null || typeof defaultValues !== 'object') {
+      throw new Error(
+        'Can not call `Record` with a non-object as default values. Use a plain javascript object instead.'
+      );
+    }
+  }
+
   var Record = function Record(defaultValues, name) {
     var hasInitialized;
+
+    throwOnInvalidDefaultValues(defaultValues);
 
     var RecordType = function Record(values) {
       var this$1 = this;
