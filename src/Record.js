@@ -30,9 +30,11 @@ import invariant from './utils/invariant';
 import quoteString from './utils/quoteString';
 import { isImmutable } from './predicates/isImmutable';
 
-function convertDefaultValues(defaultValues) {
+function throwOnInvalidDefaultValues(defaultValues) {
   if (isRecord(defaultValues)) {
-    return defaultValues.toObject();
+    throw new Error(
+      'Can not call `Record` with an immutable Record as default values. Use a plain javascript object instead.'
+    );
   }
 
   if (isImmutable(defaultValues)) {
@@ -46,15 +48,13 @@ function convertDefaultValues(defaultValues) {
       'Can not call `Record` with a non-object as default values. Use a plain javascript object instead.'
     );
   }
-
-  return defaultValues;
 }
 
 export class Record {
   constructor(defaultValues, name) {
     let hasInitialized;
 
-    const _convertedDefaultValues = convertDefaultValues(defaultValues);
+    throwOnInvalidDefaultValues(defaultValues);
 
     const RecordType = function Record(values) {
       if (values instanceof RecordType) {
@@ -65,14 +65,14 @@ export class Record {
       }
       if (!hasInitialized) {
         hasInitialized = true;
-        const keys = Object.keys(_convertedDefaultValues);
+        const keys = Object.keys(defaultValues);
         const indices = (RecordTypePrototype._indices = {});
         // Deprecated: left to attempt not to break any external code which
         // relies on a ._name property existing on record instances.
         // Use Record.getDescriptiveName() instead
         RecordTypePrototype._name = name;
         RecordTypePrototype._keys = keys;
-        RecordTypePrototype._defaultValues = _convertedDefaultValues;
+        RecordTypePrototype._defaultValues = defaultValues;
         for (let i = 0; i < keys.length; i++) {
           const propName = keys[i];
           indices[propName] = i;

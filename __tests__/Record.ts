@@ -265,10 +265,9 @@ describe('Record', () => {
   it('does not accept a Record as constructor', () => {
     const Foo = Record({ foo: 'bar' });
     const fooInstance = Foo();
-    const Bar = Record(fooInstance);
-    const barInstance = Bar();
-
-    expect(barInstance.toJS()).toEqual(fooInstance.toJS());
+    expect(() => {
+      Record(fooInstance);
+    }).toThrowErrorMatchingSnapshot();
   });
 
   it('does not accept a non object as constructor', () => {
