@@ -3202,8 +3202,7 @@ var List = /*@__PURE__*/(function (IndexedCollection$$1) {
     if (this.__ownerID) {
       this.size = this._origin = this._capacity = 0;
       this._level = SHIFT;
-      this._root = this._tail = null;
-      this.__hash = undefined;
+      this._root = this._tail = this.__hash = undefined;
       this.__altered = true;
       return this;
     }
@@ -5597,6 +5596,7 @@ Record.prototype.remove = function remove (k) {
 
 Record.prototype.clear = function clear () {
   var newValues = this._values.clear().setSize(this._keys.length);
+
   return this.__ownerID ? this : makeRecord(this, newValues);
 };
 
