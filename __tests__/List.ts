@@ -795,8 +795,8 @@ describe('List', () => {
 
   it('calling `clear` and `setSize` while mutating should set all items to undefined', () => {
     const l = List(['a', 'b']);
-    const l2 = l.withMutations((l) => {
-      l.clear().setSize(3);
+    const l2 = l.withMutations((innerList) => {
+      innerList.clear().setSize(3);
     });
     expect(l2.get(0)).toBeUndefined();
     expect(l2.get(1)).toBeUndefined();
