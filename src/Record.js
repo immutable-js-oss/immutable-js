@@ -151,14 +151,9 @@ export class Record {
   }
 
   clear() {
-    if (this.__ownerID) {
-      this._values.clear();
-
-      return this;
-    }
     const newValues = this._values.clear().setSize(this._keys.length);
 
-    return makeRecord(this, newValues);
+    return this.__ownerID ? this : makeRecord(this, newValues);
   }
 
   wasAltered() {
