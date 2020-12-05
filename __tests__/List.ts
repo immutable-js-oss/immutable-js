@@ -470,8 +470,8 @@ describe('List', () => {
     expect(v.toArray()).toEqual([]);
   });
 
-  it('remove removes any index', () => {
-    let v = List.of('a', 'b', 'c').remove(2).remove(0);
+  it.each(['remove', 'delete'])('remove removes any index', (fn) => {
+    let v = List.of('a', 'b', 'c')[fn](2)[fn](0);
     expect(v.size).toBe(1);
     expect(v.get(0)).toBe('b');
     expect(v.get(1)).toBe(undefined);
@@ -782,6 +782,25 @@ describe('List', () => {
     const v1 = List(['x']);
     const v2 = v1.withMutations((v) => v.push('y').pop().pop());
     expect(v2).toBe(List());
+  });
+
+  it('calling `clear` and `setSize` should set all items to undefined', () => {
+    const l = List(['a', 'b']);
+    const l2 = l.clear().setSize(3);
+
+    expect(l2.get(0)).toBeUndefined();
+    expect(l2.get(1)).toBeUndefined();
+    expect(l2.get(2)).toBeUndefined();
+  });
+
+  it('calling `clear` and `setSize` while mutating should set all items to undefined', () => {
+    const l = List(['a', 'b']);
+    const l2 = l.withMutations((innerList) => {
+      innerList.clear().setSize(3);
+    });
+    expect(l2.get(0)).toBeUndefined();
+    expect(l2.get(1)).toBeUndefined();
+    expect(l2.get(2)).toBeUndefined();
   });
 
   it('allows size to be set', () => {
