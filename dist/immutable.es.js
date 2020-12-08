@@ -4351,19 +4351,25 @@ var Set = /*@__PURE__*/(function (SetCollection$$1) {
   Set.prototype.map = function map (mapper, context) {
     var this$1 = this;
 
-    var removes = [];
-    var adds = [];
-    this.forEach(function (value) {
-      var mapped = mapper.call(context, value, value, this$1);
-      if (mapped !== value) {
-        removes.push(value);
-        adds.push(mapped);
-      }
-    });
-    return this.withMutations(function (set) {
-      removes.forEach(function (value) { return set.remove(value); });
-      adds.forEach(function (value) { return set.add(value); });
-    });
+    // keep track if the set is altered by the map function
+    var didChanges = false;
+
+    var newMap = updateSet(
+      this,
+      this._map.mapEntries(function (ref) {
+        var v = ref[1];
+
+        var mapped = mapper.call(context, v, v, this$1);
+
+        if (mapped !== v) {
+          didChanges = true;
+        }
+
+        return [mapped, mapped];
+      }, context)
+    );
+
+    return didChanges ? newMap : this;
   };
 
   Set.prototype.union = function union () {
