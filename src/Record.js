@@ -28,10 +28,33 @@ import { asImmutable } from './methods/asImmutable';
 
 import invariant from './utils/invariant';
 import quoteString from './utils/quoteString';
+import { isImmutable } from './predicates/isImmutable';
+
+function throwOnInvalidDefaultValues(defaultValues) {
+  if (isRecord(defaultValues)) {
+    throw new Error(
+      'Can not call `Record` with an immutable Record as default values. Use a plain javascript object instead.'
+    );
+  }
+
+  if (isImmutable(defaultValues)) {
+    throw new Error(
+      'Can not call `Record` with an immutable Collection as default values. Use a plain javascript object instead.'
+    );
+  }
+
+  if (defaultValues === null || typeof defaultValues !== 'object') {
+    throw new Error(
+      'Can not call `Record` with a non-object as default values. Use a plain javascript object instead.'
+    );
+  }
+}
 
 export class Record {
   constructor(defaultValues, name) {
     let hasInitialized;
+
+    throwOnInvalidDefaultValues(defaultValues);
 
     const RecordType = function Record(values) {
       if (values instanceof RecordType) {
@@ -105,10 +128,7 @@ export class Record {
 
   equals(other) {
     return (
-      this === other ||
-      (other &&
-        this._keys === other._keys &&
-        recordSeq(this).equals(recordSeq(other)))
+      this === other || (other && recordSeq(this).equals(recordSeq(other)))
     );
   }
 
@@ -152,6 +172,7 @@ export class Record {
 
   clear() {
     const newValues = this._values.clear().setSize(this._keys.length);
+
     return this.__ownerID ? this : makeRecord(this, newValues);
   }
 
