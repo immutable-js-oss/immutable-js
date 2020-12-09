@@ -17,7 +17,7 @@ import {
   mergeDeepWith,
   Record,
   Set,
-} from '../src/Immutable';
+} from 'immutable';
 
 describe('merge', () => {
   it('merges two maps', () => {

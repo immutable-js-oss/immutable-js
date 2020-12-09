@@ -16,7 +16,7 @@ import {
   Set,
   setIn,
   updateIn,
-} from '../src/Immutable';
+} from 'immutable';
 
 describe('updateIn', () => {
   it('deep edit', () => {

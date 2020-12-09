@@ -15,7 +15,7 @@ import {
   Map,
   Set,
   Stack,
-} from '../src/Immutable';
+} from 'immutable';
 
 describe('isImmutable', () => {
   it('behaves as advertised', () => {

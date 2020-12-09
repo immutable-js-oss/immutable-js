@@ -50,6 +50,7 @@
       "js",
       "ts"
     ],
+    "resolver": "<rootDir>/resources/jestResolver.js",
     "transform": {
       "^.+\\.(js|ts)$": "<rootDir>/resources/jestPreprocessor.js"
     },

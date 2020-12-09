@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { Repeat } from '../src/Immutable';
+import { Repeat } from 'immutable';
 
 describe('Repeat', () => {
   it('fixed repeat', () => {

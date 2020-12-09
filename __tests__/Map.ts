@@ -10,7 +10,7 @@
 import * as jasmineCheck from 'jasmine-check';
 jasmineCheck.install();
 
-import { is, List, Map, Range, Record, Seq } from '../src/Immutable';
+import { is, List, Map, Range, Record, Seq } from 'immutable';
 
 describe('Map', () => {
   it('converts from object', () => {

@@ -7,7 +7,7 @@
 
 ///<reference path='../resources/jest.d.ts'/>
 
-import { isCollection, isIndexed, Seq } from '../src/Immutable';
+import { isCollection, isIndexed, Seq } from 'immutable';
 
 describe('Seq', () => {
   it('returns undefined if empty and first is called without default argument', () => {
