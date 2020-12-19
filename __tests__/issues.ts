@@ -5,11 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-
 ///<reference path='../resources/jest.d.ts'/>
 
 declare var Symbol: any;
-import { fromJS, List, OrderedMap, OrderedSet, Record, Seq, Set } from 'immutable';
+import {
+  fromJS,
+  List,
+  OrderedMap,
+  OrderedSet,
+  Record,
+  Seq,
+  Set,
+} from 'immutable';
 
 describe('Issue #1175', () => {
   it('invalid hashCode() response should not infinitly recurse', () => {
@@ -134,27 +141,33 @@ describe('Issue #1785', () => {
 });
 
 describe('Issue #1475', () => {
-  it('complex case should throw TypeError on mergeDeep when types aren\'t compatible', () => {
+  it("complex case should throw TypeError on mergeDeep when types aren't compatible", () => {
     const a = fromJS({
-      ch: [{
-        code: 8,
-      }],
+      ch: [
+        {
+          code: 8,
+        },
+      ],
     });
     const b = fromJS({
       ch: {
         code: 8,
       },
     });
-    expect(() => { a.mergeDeep(b) }).toThrowError(TypeError);
+    expect(() => {
+      a.mergeDeep(b);
+    }).toThrowError(TypeError);
   });
 
-  it('simple case should throw TypeError on mergeDeep when types aren\'t compatible', () => {
+  it("simple case should throw TypeError on mergeDeep when types aren't compatible", () => {
     const a = fromJS({
       ch: [],
     });
     const b = fromJS({
       ch: { code: 8 },
     });
-    expect(() => { a.mergeDeep(b) }).toThrowError(TypeError);
-  })
+    expect(() => {
+      a.mergeDeep(b);
+    }).toThrowError(TypeError);
+  });
 });

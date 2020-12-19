@@ -6,6 +6,7 @@
  */
 
 import { isImmutable } from '../predicates/isImmutable';
+import { isKeyed } from '../predicates/isKeyed';
 import { IndexedCollection, KeyedCollection } from '../Collection';
 import hasOwnProperty from '../utils/hasOwnProperty';
 import isDataStructure from '../utils/isDataStructure';
@@ -68,7 +69,11 @@ export function mergeWithSources(collection, sources, merger) {
         }
       };
   for (let i = 0; i < sources.length; i++) {
-    Collection(sources[i]).forEach(mergeItem);
+    const source = sources[i];
+    if (isArray && isKeyed(source)) {
+      throw new TypeError('Expected non-keyed argument: ' + source);
+    }
+    Collection(source).forEach(mergeItem);
   }
   return merged;
 }

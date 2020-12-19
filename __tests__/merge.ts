@@ -283,21 +283,28 @@ describe('merge', () => {
     expect(Sizable().merge({ size: 123 }).size).toBe(123);
   });
 
-  describe('throws typeError when merging', () => {
+  describe('throws TypeError when merging', () => {
     const incompatibleMerges = [
-      ['Map', 'List', Map({ foo: 'bar' }), List([0])],
-      ['Map', 'array', Map({ foo: 'bar' }), [0]],
-      ['object', 'List', { foo: 'bar' }, List([0])],
-      ['object', 'array', { foo: 'bar' }, [0]],
-    ]
+      ['Map', 'List', Map({ foo: 'bar' }), List(['bar'])],
+      ['Map', 'array', Map({ foo: 'bar' }), ['bar']],
+      ['object', 'List', { foo: 'bar' }, List(['bar'])],
+      ['object', 'array', { foo: 'bar' }, ['bar']],
+    ];
 
-    incompatibleMerges.forEach(([firstName, secondName, firstValue, secondValue]) => {
-      it(`${firstName} and ${secondName}`, () => {
-        expect(() => { merge(firstValue, secondValue) }).toThrowError(TypeError);
-      });
-      it(`${secondName} and ${firstName}`, () => {
-        expect(() => { merge(secondValue, firstValue) }).toThrowError(TypeError);
-      });
-    });
+    incompatibleMerges.forEach(
+      ([firstName, secondName, firstValue, secondValue]) => {
+        it(`${firstName} and ${secondName}`, () => {
+          expect(() => {
+            const result = merge(firstValue, secondValue);
+            console.log(result.toJS());
+          }).toThrowError(TypeError);
+        });
+        it(`${secondName} and ${firstName}`, () => {
+          expect(() => {
+            merge(secondValue, firstValue);
+          }).toThrowError(TypeError);
+        });
+      }
+    );
   });
 });
