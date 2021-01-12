@@ -295,8 +295,7 @@ describe('merge', () => {
       ([firstName, secondName, firstValue, secondValue]) => {
         it(`${firstName} and ${secondName}`, () => {
           expect(() => {
-            const result = merge(firstValue, secondValue);
-            console.log(result.toJS());
+            merge(firstValue, secondValue);
           }).toThrowError(TypeError);
         });
         it(`${secondName} and ${firstName}`, () => {
