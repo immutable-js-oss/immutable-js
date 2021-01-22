@@ -74,7 +74,7 @@ export function mergeWithSources(collection, sources, merger) {
   for (let i = 0; i < sources.length; i++) {
     const source = sources[i];
     if (
-      (isArray && (isKeyed(source) || isPlainObject(source))) ||
+      (isArray && (isPlainObject(source) || isKeyed(source))) ||
       (isObject && (Array.isArray(source) || isIndexed(source)))
     ) {
       throw new TypeError('Expected non-keyed argument: ' + source);
