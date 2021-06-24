@@ -2247,6 +2247,7 @@ function mergeWithSources(collection, sources, merger) {
       : collection.concat.apply(collection, sources);
   }
   var isArray = Array.isArray(collection);
+  var isObject = !isArray;
   var merged = collection;
   var Collection$$1 = isArray ? IndexedCollection : KeyedCollection;
   var mergeItem = isArray
@@ -2270,7 +2271,14 @@ function mergeWithSources(collection, sources, merger) {
         }
       };
   for (var i = 0; i < sources.length; i++) {
-    Collection$$1(sources[i]).forEach(mergeItem);
+    var source = sources[i];
+    if (
+      (isArray && (isPlainObject(source) || isKeyed(source))) ||
+      (isObject && (Array.isArray(source) || isIndexed(source)))
+    ) {
+      continue;
+    }
+    Collection$$1(source).forEach(mergeItem);
   }
   return merged;
 }
@@ -3246,10 +3254,16 @@ var List = /*@__PURE__*/(function (IndexedCollection$$1) {
     var seqs = [];
     for (var i = 0; i < arguments.length; i++) {
       var argument = arguments$1[i];
+      var argumentHasIterator =
+        typeof argument !== 'string' && hasIterator(argument);
+      if (
+        isKeyed(argument) ||
+        (!argumentHasIterator && isPlainObject(argument))
+      ) {
+        continue;
+      }
       var seq = IndexedCollection$$1(
-        typeof argument !== 'string' && hasIterator(argument)
-          ? argument
-          : [argument]
+        argumentHasIterator ? argument : [argument]
       );
       if (seq.size !== 0) {
         seqs.push(seq);
