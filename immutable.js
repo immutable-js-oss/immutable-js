@@ -1,8 +1,25 @@
 /**
+ * MIT License
+ *
  * Copyright (c) 2014-present, Facebook, Inc.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 (function (global, factory) {
@@ -90,12 +107,12 @@
     return index === undefined
       ? defaultIndex
       : isNeg(index)
-        ? size === Infinity
-          ? size
-          : Math.max(0, size + index) | 0
-        : size === undefined || size === index
-          ? index
-          : Math.min(size, index) | 0;
+      ? size === Infinity
+        ? size
+        : Math.max(0, size + index) | 0
+      : size === undefined || size === index
+      ? index
+      : Math.min(size, index) | 0;
   }
 
   function isNeg(value) {
@@ -213,10 +230,10 @@
   Iterator.VALUES = ITERATE_VALUES;
   Iterator.ENTRIES = ITERATE_ENTRIES;
 
-  Iterator.prototype.inspect = Iterator.prototype.toSource = function() {
+  Iterator.prototype.inspect = Iterator.prototype.toSource = function () {
     return this.toString();
   };
-  Iterator.prototype[ITERATOR_SYMBOL] = function() {
+  Iterator.prototype[ITERATOR_SYMBOL] = function () {
     return this;
   };
 
@@ -284,8 +301,8 @@
       return value === null || value === undefined
         ? emptySequence()
         : isImmutable(value)
-          ? value.toSeq()
-          : seqFromValue(value);
+        ? value.toSeq()
+        : seqFromValue(value);
     }
 
     if ( Collection$$1 ) Seq.__proto__ = Collection$$1;
@@ -352,12 +369,12 @@
       return value === null || value === undefined
         ? emptySequence().toKeyedSeq()
         : isCollection(value)
-          ? isKeyed(value)
-            ? value.toSeq()
-            : value.fromEntrySeq()
-          : isRecord(value)
-            ? value.toSeq()
-            : keyedSeqFromValue(value);
+        ? isKeyed(value)
+          ? value.toSeq()
+          : value.fromEntrySeq()
+        : isRecord(value)
+        ? value.toSeq()
+        : keyedSeqFromValue(value);
     }
 
     if ( Seq ) KeyedSeq.__proto__ = Seq;
@@ -376,12 +393,12 @@
       return value === null || value === undefined
         ? emptySequence()
         : isCollection(value)
-          ? isKeyed(value)
-            ? value.entrySeq()
-            : value.toIndexedSeq()
-          : isRecord(value)
-            ? value.toSeq().entrySeq()
-            : indexedSeqFromValue(value);
+        ? isKeyed(value)
+          ? value.entrySeq()
+          : value.toIndexedSeq()
+        : isRecord(value)
+        ? value.toSeq().entrySeq()
+        : indexedSeqFromValue(value);
     }
 
     if ( Seq ) IndexedSeq.__proto__ = Seq;
@@ -592,8 +609,8 @@
     var seq = Array.isArray(value)
       ? new ArraySeq(value)
       : hasIterator(value)
-        ? new CollectionSeq(value)
-        : undefined;
+      ? new CollectionSeq(value)
+      : undefined;
     if (seq) {
       return seq.fromEntrySeq();
     }
@@ -633,8 +650,8 @@
     return isArrayLike(value)
       ? new ArraySeq(value)
       : hasIterator(value)
-        ? new CollectionSeq(value)
-        : undefined;
+      ? new CollectionSeq(value)
+      : undefined;
   }
 
   var IS_MAP_SYMBOL = '@@__IMMUTABLE_MAP__@@';
@@ -759,39 +776,48 @@
   var defaultValueOf = Object.prototype.valueOf;
 
   function hash(o) {
-    switch (typeof o) {
+    if (o == null) {
+      return hashNullish(o);
+    }
+
+    if (typeof o.hashCode === 'function') {
+      // Drop any high bits from accidentally long hash codes.
+      return smi(o.hashCode(o));
+    }
+
+    var v = valueOf(o);
+
+    if (v == null) {
+      return hashNullish(v);
+    }
+
+    switch (typeof v) {
       case 'boolean':
         // The hash values for built-in constants are a 1 value for each 5-byte
         // shift region expect for the first, which encodes the value. This
         // reduces the odds of a hash collision for these common values.
-        return o ? 0x42108421 : 0x42108420;
+        return v ? 0x42108421 : 0x42108420;
       case 'number':
-        return hashNumber(o);
+        return hashNumber(v);
       case 'string':
-        return o.length > STRING_HASH_CACHE_MIN_STRLEN
-          ? cachedHashString(o)
-          : hashString(o);
+        return v.length > STRING_HASH_CACHE_MIN_STRLEN
+          ? cachedHashString(v)
+          : hashString(v);
       case 'object':
       case 'function':
-        if (o === null) {
-          return 0x42108422;
-        }
-        if (typeof o.hashCode === 'function') {
-          // Drop any high bits from accidentally long hash codes.
-          return smi(o.hashCode(o));
-        }
-        if (o.valueOf !== defaultValueOf && typeof o.valueOf === 'function') {
-          o = o.valueOf(o);
-        }
-        return hashJSObj(o);
-      case 'undefined':
-        return 0x42108423;
+        return hashJSObj(v);
+      case 'symbol':
+        return hashSymbol(v);
       default:
-        if (typeof o.toString === 'function') {
-          return hashString(o.toString());
+        if (typeof v.toString === 'function') {
+          return hashString(v.toString());
         }
-        throw new Error('Value type ' + typeof o + ' cannot be hashed.');
+        throw new Error('Value type ' + typeof v + ' cannot be hashed.');
     }
+  }
+
+  function hashNullish(nullish) {
+    return nullish === null ? 0x42108422 : /* undefined */ 0x42108423;
   }
 
   // Compress arbitrarily large numbers into smi hashes.
@@ -839,6 +865,19 @@
     return smi(hashed);
   }
 
+  function hashSymbol(sym) {
+    var hashed = symbolMap[sym];
+    if (hashed !== undefined) {
+      return hashed;
+    }
+
+    hashed = nextHash();
+
+    symbolMap[sym] = hashed;
+
+    return hashed;
+  }
+
   function hashJSObj(obj) {
     var hashed;
     if (usingWeakMap) {
@@ -865,10 +904,7 @@
       }
     }
 
-    hashed = ++objHashUID;
-    if (objHashUID & 0x40000000) {
-      objHashUID = 0;
-    }
+    hashed = nextHash();
 
     if (usingWeakMap) {
       weakMap.set(obj, hashed);
@@ -889,7 +925,7 @@
       // we'll hijack one of the less-used non-enumerable properties to
       // save our hash on it. Since this is a function it will not show up in
       // `JSON.stringify` which is what we want.
-      obj.propertyIsEnumerable = function() {
+      obj.propertyIsEnumerable = function () {
         return this.constructor.prototype.propertyIsEnumerable.apply(
           this,
           arguments
@@ -913,7 +949,7 @@
   var isExtensible = Object.isExtensible;
 
   // True if Object.defineProperty works as expected. IE8 fails this test.
-  var canDefineProperty = (function() {
+  var canDefineProperty = (function () {
     try {
       Object.defineProperty({}, '@', {});
       return true;
@@ -935,6 +971,20 @@
     }
   }
 
+  function valueOf(obj) {
+    return obj.valueOf !== defaultValueOf && typeof obj.valueOf === 'function'
+      ? obj.valueOf(obj)
+      : obj;
+  }
+
+  function nextHash() {
+    var nextHash = ++_objHashUID;
+    if (_objHashUID & 0x40000000) {
+      _objHashUID = 0;
+    }
+    return nextHash;
+  }
+
   // If possible, use a WeakMap.
   var usingWeakMap = typeof WeakMap === 'function';
   var weakMap;
@@ -942,7 +992,9 @@
     weakMap = new WeakMap();
   }
 
-  var objHashUID = 0;
+  var symbolMap = Object.create(null);
+
+  var _objHashUID = 0;
 
   var UID_HASH_KEY = '__immutablehash__';
   if (typeof Symbol === 'function') {
@@ -1158,7 +1210,7 @@
     flipSequence._iter = collection;
     flipSequence.size = collection.size;
     flipSequence.flip = function () { return collection; };
-    flipSequence.reverse = function() {
+    flipSequence.reverse = function () {
       var reversedSequence = collection.reverse.apply(this); // super.reverse()
       reversedSequence.flip = function () { return collection.reverse(); };
       return reversedSequence;
@@ -1166,12 +1218,12 @@
     flipSequence.has = function (key) { return collection.includes(key); };
     flipSequence.includes = function (key) { return collection.has(key); };
     flipSequence.cacheResult = cacheResultThrough;
-    flipSequence.__iterateUncached = function(fn, reverse) {
+    flipSequence.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       return collection.__iterate(function (v, k) { return fn(k, v, this$1) !== false; }, reverse);
     };
-    flipSequence.__iteratorUncached = function(type, reverse) {
+    flipSequence.__iteratorUncached = function (type, reverse) {
       if (type === ITERATE_ENTRIES) {
         var iterator = collection.__iterator(type, reverse);
         return new Iterator(function () {
@@ -1202,7 +1254,7 @@
         ? notSetValue
         : mapper.call(context, v, key, collection);
     };
-    mappedSequence.__iterateUncached = function(fn, reverse) {
+    mappedSequence.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       return collection.__iterate(
@@ -1210,7 +1262,7 @@
         reverse
       );
     };
-    mappedSequence.__iteratorUncached = function(type, reverse) {
+    mappedSequence.__iteratorUncached = function (type, reverse) {
       var iterator = collection.__iterator(ITERATE_ENTRIES, reverse);
       return new Iterator(function () {
         var step = iterator.next();
@@ -1238,7 +1290,7 @@
     reversedSequence.size = collection.size;
     reversedSequence.reverse = function () { return collection; };
     if (collection.flip) {
-      reversedSequence.flip = function() {
+      reversedSequence.flip = function () {
         var flipSequence = flipFactory(collection);
         flipSequence.reverse = function () { return collection.flip(); };
         return flipSequence;
@@ -1248,7 +1300,7 @@
     reversedSequence.has = function (key) { return collection.has(useKeys ? key : -1 - key); };
     reversedSequence.includes = function (value) { return collection.includes(value); };
     reversedSequence.cacheResult = cacheResultThrough;
-    reversedSequence.__iterate = function(fn, reverse) {
+    reversedSequence.__iterate = function (fn, reverse) {
       var this$1 = this;
 
       var i = 0;
@@ -1293,7 +1345,7 @@
           : notSetValue;
       };
     }
-    filterSequence.__iterateUncached = function(fn, reverse) {
+    filterSequence.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       var iterations = 0;
@@ -1305,7 +1357,7 @@
       }, reverse);
       return iterations;
     };
-    filterSequence.__iteratorUncached = function(type, reverse) {
+    filterSequence.__iteratorUncached = function (type, reverse) {
       var iterator = collection.__iterator(ITERATE_ENTRIES, reverse);
       var iterations = 0;
       return new Iterator(function () {
@@ -1382,7 +1434,7 @@
       sliceSize === 0 ? sliceSize : (collection.size && sliceSize) || undefined;
 
     if (!useKeys && isSeq(collection) && sliceSize >= 0) {
-      sliceSeq.get = function(index, notSetValue) {
+      sliceSeq.get = function (index, notSetValue) {
         index = wrapIndex(this, index);
         return index >= 0 && index < sliceSize
           ? collection.get(index + resolvedBegin, notSetValue)
@@ -1390,7 +1442,7 @@
       };
     }
 
-    sliceSeq.__iterateUncached = function(fn, reverse) {
+    sliceSeq.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       if (sliceSize === 0) {
@@ -1414,7 +1466,7 @@
       return iterations;
     };
 
-    sliceSeq.__iteratorUncached = function(type, reverse) {
+    sliceSeq.__iteratorUncached = function (type, reverse) {
       if (sliceSize !== 0 && reverse) {
         return this.cacheResult().__iterator(type, reverse);
       }
@@ -1448,7 +1500,7 @@
 
   function takeWhileFactory(collection, predicate, context) {
     var takeSequence = makeSequence(collection);
-    takeSequence.__iterateUncached = function(fn, reverse) {
+    takeSequence.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       if (reverse) {
@@ -1460,7 +1512,7 @@
       );
       return iterations;
     };
-    takeSequence.__iteratorUncached = function(type, reverse) {
+    takeSequence.__iteratorUncached = function (type, reverse) {
       var this$1 = this;
 
       if (reverse) {
@@ -1491,7 +1543,7 @@
 
   function skipWhileFactory(collection, predicate, context, useKeys) {
     var skipSequence = makeSequence(collection);
-    skipSequence.__iterateUncached = function(fn, reverse) {
+    skipSequence.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       if (reverse) {
@@ -1507,7 +1559,7 @@
       });
       return iterations;
     };
-    skipSequence.__iteratorUncached = function(type, reverse) {
+    skipSequence.__iteratorUncached = function (type, reverse) {
       var this$1 = this;
 
       if (reverse) {
@@ -1593,7 +1645,7 @@
 
   function flattenFactory(collection, depth, useKeys) {
     var flatSequence = makeSequence(collection);
-    flatSequence.__iterateUncached = function(fn, reverse) {
+    flatSequence.__iterateUncached = function (fn, reverse) {
       if (reverse) {
         return this.cacheResult().__iterate(fn, reverse);
       }
@@ -1615,7 +1667,7 @@
       flatDeep(collection, 0);
       return iterations;
     };
-    flatSequence.__iteratorUncached = function(type, reverse) {
+    flatSequence.__iteratorUncached = function (type, reverse) {
       if (reverse) {
         return this.cacheResult().__iterator(type, reverse);
       }
@@ -1657,7 +1709,7 @@
   function interposeFactory(collection, separator) {
     var interposedSequence = makeSequence(collection);
     interposedSequence.size = collection.size && collection.size * 2 - 1;
-    interposedSequence.__iterateUncached = function(fn, reverse) {
+    interposedSequence.__iterateUncached = function (fn, reverse) {
       var this$1 = this;
 
       var iterations = 0;
@@ -1668,7 +1720,7 @@
       );
       return iterations;
     };
-    interposedSequence.__iteratorUncached = function(type, reverse) {
+    interposedSequence.__iteratorUncached = function (type, reverse) {
       var iterator = collection.__iterator(ITERATE_VALUES, reverse);
       var iterations = 0;
       var step;
@@ -1698,20 +1750,22 @@
       .map(function (v, k) { return [k, v, index++, mapper ? mapper(v, k, collection) : v]; })
       .valueSeq()
       .toArray();
-    entries.sort(function (a, b) { return comparator(a[3], b[3]) || a[2] - b[2]; }).forEach(
-      isKeyedCollection
-        ? function (v, i) {
-            entries[i].length = 2;
-          }
-        : function (v, i) {
-            entries[i] = v[1];
-          }
-    );
+    entries
+      .sort(function (a, b) { return comparator(a[3], b[3]) || a[2] - b[2]; })
+      .forEach(
+        isKeyedCollection
+          ? function (v, i) {
+              entries[i].length = 2;
+            }
+          : function (v, i) {
+              entries[i] = v[1];
+            }
+      );
     return isKeyedCollection
       ? KeyedSeq(entries)
       : isIndexed(collection)
-        ? IndexedSeq(entries)
-        : SetSeq(entries);
+      ? IndexedSeq(entries)
+      : SetSeq(entries);
   }
 
   function maxFactory(collection, comparator, mapper) {
@@ -1744,7 +1798,7 @@
     zipSequence.size = zipAll ? sizes.max() : sizes.min();
     // Note: this a generic base implementation of __iterate in terms of
     // __iterator which may be more generically useful in the future.
-    zipSequence.__iterate = function(fn, reverse) {
+    zipSequence.__iterate = function (fn, reverse) {
       /* generic:
       var iterator = this.__iterator(ITERATE_ENTRIES, reverse);
       var step;
@@ -1768,7 +1822,7 @@
       }
       return iterations;
     };
-    zipSequence.__iteratorUncached = function(type, reverse) {
+    zipSequence.__iteratorUncached = function (type, reverse) {
       var iterators = iters.map(
         function (i) { return ((i = Collection(i)), getIterator(reverse ? i.reverse() : i)); }
       );
@@ -1778,7 +1832,9 @@
         var steps;
         if (!isDone) {
           steps = iterators.map(function (i) { return i.next(); });
-          isDone = zipAll ? steps.every(function (s) { return s.done; }) : steps.some(function (s) { return s.done; });
+          isDone = zipAll
+            ? steps.every(function (s) { return s.done; })
+            : steps.some(function (s) { return s.done; });
         }
         if (isDone) {
           return iteratorDone();
@@ -1786,7 +1842,10 @@
         return iteratorValue(
           type,
           iterations++,
-          zipper.apply(null, steps.map(function (s) { return s.value; }))
+          zipper.apply(
+            null,
+            steps.map(function (s) { return s.value; })
+          )
         );
       });
     };
@@ -1809,8 +1868,8 @@
     return isKeyed(collection)
       ? KeyedCollection
       : isIndexed(collection)
-        ? IndexedCollection
-        : SetCollection;
+      ? IndexedCollection
+      : SetCollection;
   }
 
   function makeSequence(collection) {
@@ -1818,8 +1877,8 @@
       (isKeyed(collection)
         ? KeyedSeq
         : isIndexed(collection)
-          ? IndexedSeq
-          : SetSeq
+        ? IndexedSeq
+        : SetSeq
       ).prototype
     );
   }
@@ -1883,12 +1942,31 @@
     );
   }
 
-  function isPlainObj(value) {
-    return (
-      value &&
-      (typeof value.constructor !== 'function' ||
-        value.constructor.name === 'Object')
-    );
+  var toString = Object.prototype.toString;
+
+  function isPlainObject(value) {
+    // The base prototype's toString deals with Argument objects and native namespaces like Math
+    if (
+      !value ||
+      typeof value !== 'object' ||
+      toString.call(value) !== '[object Object]'
+    ) {
+      return false;
+    }
+
+    var proto = Object.getPrototypeOf(value);
+    if (proto === null) {
+      return true;
+    }
+
+    // Iteratively going up the prototype chain is needed for cross-realm environments (differing contexts, iframes, etc)
+    var parentProto = proto;
+    var nextProto = Object.getPrototypeOf(proto);
+    while (nextProto !== null) {
+      parentProto = nextProto;
+      nextProto = Object.getPrototypeOf(parentProto);
+    }
+    return parentProto === proto;
   }
 
   /**
@@ -1898,7 +1976,7 @@
   function isDataStructure(value) {
     return (
       typeof value === 'object' &&
-      (isImmutable(value) || Array.isArray(value) || isPlainObj(value))
+      (isImmutable(value) || Array.isArray(value) || isPlainObject(value))
     );
   }
 
@@ -1923,10 +2001,10 @@
     return isImmutable(collection)
       ? collection.get(key, notSetValue)
       : !has(collection, key)
-        ? notSetValue
-        : typeof collection.get === 'function'
-          ? collection.get(key)
-          : collection[key];
+      ? notSetValue
+      : typeof collection.get === 'function'
+      ? collection.get(key)
+      : collection[key];
   }
 
   function shallowCopy(from) {
@@ -2041,12 +2119,12 @@
     return nextUpdated === nextExisting
       ? existing
       : nextUpdated === NOT_SET
-        ? remove(existing, key)
-        : set(
-            wasNotSet ? (inImmutable ? emptyMap() : {}) : existing,
-            key,
-            nextUpdated
-          );
+      ? remove(existing, key)
+      : set(
+          wasNotSet ? (inImmutable ? emptyMap() : {}) : existing,
+          key,
+          nextUpdated
+        );
   }
 
   function setIn(collection, keyPath, value) {
@@ -2117,11 +2195,7 @@
     return collection.withMutations(function (collection) {
       var mergeIntoCollection = merger
         ? function (value, key) {
-            update(
-              collection,
-              key,
-              NOT_SET,
-              function (oldVal) { return (oldVal === NOT_SET ? value : merger(oldVal, value, key)); }
+            update(collection, key, NOT_SET, function (oldVal) { return oldVal === NOT_SET ? value : merger(oldVal, value, key); }
             );
           }
         : function (value, key) {
@@ -2175,8 +2249,8 @@
       return typeof merger === 'function' && collection.mergeWith
         ? collection.mergeWith.apply(collection, [ merger ].concat( sources ))
         : collection.merge
-          ? collection.merge.apply(collection, sources)
-          : collection.concat.apply(collection, sources);
+        ? collection.merge.apply(collection, sources)
+        : collection.concat.apply(collection, sources);
     }
     var isArray = Array.isArray(collection);
     var merged = collection;
@@ -2212,8 +2286,8 @@
       return isDataStructure(oldValue) && isDataStructure(newValue)
         ? mergeWithSources(oldValue, [newValue], deepMerger)
         : merger
-          ? merger(oldValue, newValue, key)
-          : newValue;
+        ? merger(oldValue, newValue, key)
+        : newValue;
     }
     return deepMerger;
   }
@@ -2270,12 +2344,12 @@
       return value === null || value === undefined
         ? emptyMap()
         : isMap(value) && !isOrdered(value)
-          ? value
-          : emptyMap().withMutations(function (map) {
-              var iter = KeyedCollection$$1(value);
-              assertNotInfinite(iter.size);
-              iter.forEach(function (v, k) { return map.set(k, v); });
-            });
+        ? value
+        : emptyMap().withMutations(function (map) {
+            var iter = KeyedCollection$$1(value);
+            assertNotInfinite(iter.size);
+            iter.forEach(function (v, k) { return map.set(k, v); });
+          });
     }
 
     if ( KeyedCollection$$1 ) Map.__proto__ = KeyedCollection$$1;
@@ -2357,9 +2431,11 @@
     };
 
     Map.prototype.map = function map (mapper, context) {
+      var this$1 = this;
+
       return this.withMutations(function (map) {
         map.forEach(function (value, key) {
-          map.set(key, mapper.call(context, value, key, map));
+          map.set(key, mapper.call(context, value, key, this$1));
         });
       });
     };
@@ -2420,10 +2496,10 @@
   MapPrototype.wasAltered = wasAltered;
   MapPrototype.asImmutable = asImmutable;
   MapPrototype['@@transducer/init'] = MapPrototype.asMutable = asMutable;
-  MapPrototype['@@transducer/step'] = function(result, arr) {
+  MapPrototype['@@transducer/step'] = function (result, arr) {
     return result.set(arr[0], arr[1]);
   };
-  MapPrototype['@@transducer/result'] = function(obj) {
+  MapPrototype['@@transducer/result'] = function (obj) {
     return obj.asImmutable();
   };
 
@@ -2762,7 +2838,7 @@
 
   // #pragma Iterators
 
-  ArrayMapNode.prototype.iterate = HashCollisionNode.prototype.iterate = function(
+  ArrayMapNode.prototype.iterate = HashCollisionNode.prototype.iterate = function (
     fn,
     reverse
   ) {
@@ -2774,7 +2850,7 @@
     }
   };
 
-  BitmapIndexedNode.prototype.iterate = HashArrayMapNode.prototype.iterate = function(
+  BitmapIndexedNode.prototype.iterate = HashArrayMapNode.prototype.iterate = function (
     fn,
     reverse
   ) {
@@ -2788,7 +2864,7 @@
   };
 
   // eslint-disable-next-line no-unused-vars
-  ValueNode.prototype.iterate = function(fn, reverse) {
+  ValueNode.prototype.iterate = function (fn, reverse) {
     return fn(this.entry);
   };
 
@@ -3115,10 +3191,10 @@
       return !this.has(index)
         ? this
         : index === 0
-          ? this.shift()
-          : index === this.size - 1
-            ? this.pop()
-            : this.splice(index, 1);
+        ? this.shift()
+        : index === this.size - 1
+        ? this.pop()
+        : this.splice(index, 1);
     };
 
     List.prototype.insert = function insert (index, value) {
@@ -3132,8 +3208,7 @@
       if (this.__ownerID) {
         this.size = this._origin = this._capacity = 0;
         this._level = SHIFT;
-        this._root = this._tail = null;
-        this.__hash = undefined;
+        this._root = this._tail = this.__hash = undefined;
         this.__altered = true;
         return this;
       }
@@ -3206,7 +3281,7 @@
 
       return this.withMutations(function (list) {
         for (var i = 0; i < this$1.size; i++) {
-          list.set(i, mapper.call(context, list.get(i), i, list));
+          list.set(i, mapper.call(context, list.get(i), i, this$1));
         }
       });
     };
@@ -3290,10 +3365,10 @@
   ListPrototype.wasAltered = wasAltered;
   ListPrototype.asImmutable = asImmutable;
   ListPrototype['@@transducer/init'] = ListPrototype.asMutable = asMutable;
-  ListPrototype['@@transducer/step'] = function(result, arr) {
+  ListPrototype['@@transducer/step'] = function (result, arr) {
     return result.push(arr);
   };
-  ListPrototype['@@transducer/result'] = function(obj) {
+  ListPrototype['@@transducer/result'] = function (obj) {
     return obj.asImmutable();
   };
 
@@ -3576,8 +3651,8 @@
       end === undefined
         ? oldCapacity
         : end < 0
-          ? oldCapacity + end
-          : oldOrigin + end;
+        ? oldCapacity + end
+        : oldOrigin + end;
     if (newOrigin === oldOrigin && newCapacity === oldCapacity) {
       return list;
     }
@@ -3625,8 +3700,8 @@
       newTailOffset < oldTailOffset
         ? listNodeFor(list, newCapacity - 1)
         : newTailOffset > oldTailOffset
-          ? new VNode([], owner)
-          : oldTail;
+        ? new VNode([], owner)
+        : oldTail;
 
     // Merge Tail into tree.
     if (
@@ -3714,12 +3789,12 @@
       return value === null || value === undefined
         ? emptyOrderedMap()
         : isOrderedMap(value)
-          ? value
-          : emptyOrderedMap().withMutations(function (map) {
-              var iter = KeyedCollection(value);
-              assertNotInfinite(iter.size);
-              iter.forEach(function (v, k) { return map.set(k, v); });
-            });
+        ? value
+        : emptyOrderedMap().withMutations(function (map) {
+            var iter = KeyedCollection(value);
+            assertNotInfinite(iter.size);
+            iter.forEach(function (v, k) { return map.set(k, v); });
+          });
     }
 
     if ( Map$$1 ) OrderedMap.__proto__ = Map$$1;
@@ -3751,6 +3826,7 @@
         this.size = 0;
         this._map.clear();
         this._list.clear();
+        this.__altered = true;
         return this;
       }
       return emptyOrderedMap();
@@ -3762,10 +3838,6 @@
 
     OrderedMap.prototype.remove = function remove (k) {
       return updateOrderedMap(this, k, NOT_SET);
-    };
-
-    OrderedMap.prototype.wasAltered = function wasAltered () {
-      return this._map.wasAltered() || this._list.wasAltered();
     };
 
     OrderedMap.prototype.__iterate = function __iterate (fn, reverse) {
@@ -3792,6 +3864,7 @@
           return emptyOrderedMap();
         }
         this.__ownerID = ownerID;
+        this.__altered = false;
         this._map = newMap;
         this._list = newList;
         return this;
@@ -3814,6 +3887,7 @@
     omap._list = list;
     omap.__ownerID = ownerID;
     omap.__hash = hash;
+    omap.__altered = false;
     return omap;
   }
 
@@ -3866,6 +3940,7 @@
       omap._map = newMap;
       omap._list = newList;
       omap.__hash = undefined;
+      omap.__altered = true;
       return omap;
     }
     return makeOrderedMap(newMap, newList);
@@ -3882,8 +3957,8 @@
       return value === null || value === undefined
         ? emptyStack()
         : isStack(value)
-          ? value
-          : emptyStack().pushAll(value);
+        ? value
+        : emptyStack().pushAll(value);
     }
 
     if ( IndexedCollection$$1 ) Stack.__proto__ = IndexedCollection$$1;
@@ -4079,10 +4154,10 @@
   StackPrototype.wasAltered = wasAltered;
   StackPrototype.asImmutable = asImmutable;
   StackPrototype['@@transducer/init'] = StackPrototype.asMutable = asMutable;
-  StackPrototype['@@transducer/step'] = function(result, arr) {
+  StackPrototype['@@transducer/step'] = function (result, arr) {
     return result.unshift(arr);
   };
-  StackPrototype['@@transducer/result'] = function(obj) {
+  StackPrototype['@@transducer/result'] = function (obj) {
     return obj.asImmutable();
   };
 
@@ -4166,8 +4241,8 @@
         notAssociative
           ? !a.has(v)
           : flipped
-            ? !is(v, a.get(k, NOT_SET))
-            : !is(a.get(k, NOT_SET), v)
+          ? !is(v, a.get(k, NOT_SET))
+          : !is(a.get(k, NOT_SET), v)
       ) {
         allEqual = false;
         return false;
@@ -4219,12 +4294,12 @@
       return value === null || value === undefined
         ? emptySet()
         : isSet(value) && !isOrdered(value)
-          ? value
-          : emptySet().withMutations(function (set) {
-              var iter = SetCollection$$1(value);
-              assertNotInfinite(iter.size);
-              iter.forEach(function (v) { return set.add(v); });
-            });
+        ? value
+        : emptySet().withMutations(function (set) {
+            var iter = SetCollection$$1(value);
+            assertNotInfinite(iter.size);
+            iter.forEach(function (v) { return set.add(v); });
+          });
     }
 
     if ( SetCollection$$1 ) Set.__proto__ = SetCollection$$1;
@@ -4282,19 +4357,25 @@
     Set.prototype.map = function map (mapper, context) {
       var this$1 = this;
 
-      var removes = [];
-      var adds = [];
-      this.forEach(function (value) {
-        var mapped = mapper.call(context, value, value, this$1);
-        if (mapped !== value) {
-          removes.push(value);
-          adds.push(mapped);
-        }
-      });
-      return this.withMutations(function (set) {
-        removes.forEach(function (value) { return set.remove(value); });
-        adds.forEach(function (value) { return set.add(value); });
-      });
+      // keep track if the set is altered by the map function
+      var didChanges = false;
+
+      var newMap = updateSet(
+        this,
+        this._map.mapEntries(function (ref) {
+          var v = ref[1];
+
+          var mapped = mapper.call(context, v, v, this$1);
+
+          if (mapped !== v) {
+            didChanges = true;
+          }
+
+          return [mapped, mapped];
+        }, context)
+      );
+
+      return didChanges ? newMap : this;
     };
 
     Set.prototype.union = function union () {
@@ -4409,10 +4490,10 @@
   SetPrototype.withMutations = withMutations;
   SetPrototype.asImmutable = asImmutable;
   SetPrototype['@@transducer/init'] = SetPrototype.asMutable = asMutable;
-  SetPrototype['@@transducer/step'] = function(result, arr) {
+  SetPrototype['@@transducer/step'] = function (result, arr) {
     return result.add(arr);
   };
-  SetPrototype['@@transducer/result'] = function(obj) {
+  SetPrototype['@@transducer/result'] = function (obj) {
     return obj.asImmutable();
   };
 
@@ -4428,8 +4509,8 @@
     return newMap === set._map
       ? set
       : newMap.size === 0
-        ? set.__empty()
-        : set.__make(newMap);
+      ? set.__empty()
+      : set.__make(newMap);
   }
 
   function makeSet(map, ownerID) {
@@ -4681,8 +4762,8 @@
       return isIndexed(this)
         ? this.toIndexedSeq()
         : isKeyed(this)
-          ? this.toKeyedSeq()
-          : this.toSetSeq();
+        ? this.toKeyedSeq()
+        : this.toSetSeq();
     },
 
     toStack: function toStack() {
@@ -4708,9 +4789,7 @@
       return (
         head +
         ' ' +
-        this.toSeq()
-          .map(this.__toStringMapper)
-          .join(', ') +
+        this.toSeq().map(this.__toStringMapper).join(', ') +
         ' ' +
         tail
       );
@@ -4851,10 +4930,7 @@
         // We cache as an entries array, so we can just return the cache!
         return new ArraySeq(collection._cache);
       }
-      var entriesSequence = collection
-        .toSeq()
-        .map(entryMapper)
-        .toIndexedSeq();
+      var entriesSequence = collection.toSeq().map(entryMapper).toIndexedSeq();
       entriesSequence.fromEntrySeq = function () { return collection.toSeq(); };
       return entriesSequence;
     },
@@ -4880,9 +4956,7 @@
     },
 
     findLast: function findLast(predicate, context, notSetValue) {
-      return this.toKeyedSeq()
-        .reverse()
-        .find(predicate, context, notSetValue);
+      return this.toKeyedSeq().reverse().find(predicate, context, notSetValue);
     },
 
     findLastEntry: function findLastEntry(predicate, context, notSetValue) {
@@ -4892,9 +4966,7 @@
     },
 
     findLastKey: function findLastKey(predicate, context) {
-      return this.toKeyedSeq()
-        .reverse()
-        .findKey(predicate, context);
+      return this.toKeyedSeq().reverse().findKey(predicate, context);
     },
 
     first: function first(notSetValue) {
@@ -4944,21 +5016,15 @@
     },
 
     keySeq: function keySeq() {
-      return this.toSeq()
-        .map(keyMapper)
-        .toIndexedSeq();
+      return this.toSeq().map(keyMapper).toIndexedSeq();
     },
 
     last: function last(notSetValue) {
-      return this.toSeq()
-        .reverse()
-        .first(notSetValue);
+      return this.toSeq().reverse().first(notSetValue);
     },
 
     lastKeyOf: function lastKeyOf(searchValue) {
-      return this.toKeyedSeq()
-        .reverse()
-        .keyOf(searchValue);
+      return this.toKeyedSeq().reverse().keyOf(searchValue);
     },
 
     max: function max(comparator) {
@@ -5050,7 +5116,7 @@
   CollectionPrototype[ITERATOR_SYMBOL] = CollectionPrototype.values;
   CollectionPrototype.toJSON = CollectionPrototype.toArray;
   CollectionPrototype.__toStringMapper = quoteString;
-  CollectionPrototype.inspect = CollectionPrototype.toSource = function() {
+  CollectionPrototype.inspect = CollectionPrototype.toSource = function () {
     return this.toString();
   };
   CollectionPrototype.chain = CollectionPrototype.flatMap;
@@ -5167,7 +5233,8 @@
     get: function get(index, notSetValue) {
       index = wrapIndex(this, index);
       return index < 0 ||
-        (this.size === Infinity || (this.size !== undefined && index > this.size))
+        this.size === Infinity ||
+        (this.size !== undefined && index > this.size)
         ? notSetValue
         : this.find(function (_, key) { return key === index; }, undefined, notSetValue);
     },
@@ -5280,13 +5347,13 @@
   }
 
   function not(predicate) {
-    return function() {
+    return function () {
       return !predicate.apply(this, arguments);
     };
   }
 
   function neg(predicate) {
-    return function() {
+    return function () {
       return -predicate.apply(this, arguments);
     };
   }
@@ -5316,12 +5383,12 @@
               h = (h + hashMerge(hash(v), hash(k))) | 0;
             }
         : ordered
-          ? function (v) {
-              h = (31 * h + hash(v)) | 0;
-            }
-          : function (v) {
-              h = (h + hash(v)) | 0;
-            }
+        ? function (v) {
+            h = (31 * h + hash(v)) | 0;
+          }
+        : function (v) {
+            h = (h + hash(v)) | 0;
+          }
     );
     return murmurHashOfSize(size, h);
   }
@@ -5346,12 +5413,12 @@
       return value === null || value === undefined
         ? emptyOrderedSet()
         : isOrderedSet(value)
-          ? value
-          : emptyOrderedSet().withMutations(function (set) {
-              var iter = SetCollection(value);
-              assertNotInfinite(iter.size);
-              iter.forEach(function (v) { return set.add(v); });
-            });
+        ? value
+        : emptyOrderedSet().withMutations(function (set) {
+            var iter = SetCollection(value);
+            assertNotInfinite(iter.size);
+            iter.forEach(function (v) { return set.add(v); });
+          });
     }
 
     if ( Set$$1 ) OrderedSet.__proto__ = Set$$1;
@@ -5398,8 +5465,30 @@
     );
   }
 
+  function throwOnInvalidDefaultValues(defaultValues) {
+    if (isRecord(defaultValues)) {
+      throw new Error(
+        'Can not call `Record` with an immutable Record as default values. Use a plain javascript object instead.'
+      );
+    }
+
+    if (isImmutable(defaultValues)) {
+      throw new Error(
+        'Can not call `Record` with an immutable Collection as default values. Use a plain javascript object instead.'
+      );
+    }
+
+    if (defaultValues === null || typeof defaultValues !== 'object') {
+      throw new Error(
+        'Can not call `Record` with a non-object as default values. Use a plain javascript object instead.'
+      );
+    }
+  }
+
   var Record = function Record(defaultValues, name) {
     var hasInitialized;
+
+    throwOnInvalidDefaultValues(defaultValues);
 
     var RecordType = function Record(values) {
       var this$1 = this;
@@ -5447,6 +5536,7 @@
           l.set(this$1._indices[k], v === this$1._defaultValues[k] ? undefined : v);
         });
       });
+      return this;
     };
 
     var RecordTypePrototype = (RecordType.prototype = Object.create(
@@ -5474,10 +5564,7 @@
 
   Record.prototype.equals = function equals (other) {
     return (
-      this === other ||
-      (other &&
-        this._keys === other._keys &&
-        recordSeq(this).equals(recordSeq(other)))
+      this === other || (other && recordSeq(this).equals(recordSeq(other)))
     );
   };
 
@@ -5521,6 +5608,7 @@
 
   Record.prototype.clear = function clear () {
     var newValues = this._values.clear().setSize(this._keys.length);
+
     return this.__ownerID ? this : makeRecord(this, newValues);
   };
 
@@ -5584,7 +5672,7 @@
   RecordPrototype[ITERATOR_SYMBOL] = RecordPrototype.entries;
   RecordPrototype.toJSON = RecordPrototype.toObject =
     CollectionPrototype.toObject;
-  RecordPrototype.inspect = RecordPrototype.toSource = function() {
+  RecordPrototype.inspect = RecordPrototype.toSource = function () {
     return this.toString();
   };
 
@@ -5606,10 +5694,10 @@
   function setProp(prototype, name) {
     try {
       Object.defineProperty(prototype, name, {
-        get: function() {
+        get: function () {
           return this.get(name);
         },
-        set: function(value) {
+        set: function (value) {
           invariant(this.__ownerID, 'Cannot set on an immutable record.');
           this.set(name, value);
         },
@@ -5701,10 +5789,9 @@
 
       var size = this.size;
       var i = 0;
-      return new Iterator(
-        function () { return i === size
-            ? iteratorDone()
-            : iteratorValue(type, reverse ? size - ++i : i++, this$1._value); }
+      return new Iterator(function () { return i === size
+          ? iteratorDone()
+          : iteratorValue(type, reverse ? size - ++i : i++, this$1._value); }
       );
     };
 
@@ -5733,9 +5820,9 @@
   function fromJSWith(stack, converter, value, key, keyPath, parentValue) {
     var toSeq = Array.isArray(value)
       ? IndexedSeq
-      : isPlainObj(value)
-        ? KeyedSeq
-        : null;
+      : isPlainObject(value)
+      ? KeyedSeq
+      : null;
     if (toSeq) {
       if (~stack.indexOf(value)) {
         throw new TypeError('Cannot convert circular structure to Immutable');
@@ -5792,6 +5879,7 @@
     isAssociative: isAssociative,
     isOrdered: isOrdered,
     isValueObject: isValueObject,
+    isPlainObject: isPlainObject,
     isSeq: isSeq,
     isList: isList,
     isMap: isMap,
@@ -5843,7 +5931,16 @@
   exports.isIndexed = isIndexed;
   exports.isAssociative = isAssociative;
   exports.isOrdered = isOrdered;
+  exports.isPlainObject = isPlainObject;
   exports.isValueObject = isValueObject;
+  exports.isSeq = isSeq;
+  exports.isList = isList;
+  exports.isMap = isMap;
+  exports.isOrderedMap = isOrderedMap;
+  exports.isStack = isStack;
+  exports.isSet = isSet;
+  exports.isOrderedSet = isOrderedSet;
+  exports.isRecord = isRecord;
   exports.get = get;
   exports.getIn = getIn;
   exports.has = has;
