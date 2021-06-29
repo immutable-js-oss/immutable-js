@@ -771,7 +771,17 @@ declare module Immutable {
   export function Map(): Map<unknown, unknown>;
   export function Map<K, V>(): Map<K, V>;
   export function Map<K, V>(collection: Iterable<[K, V]>): Map<K, V>;
-  export function Map<V>(obj: { [key: string]: V }): Map<string, V>;
+  export function Map<
+    R extends { [key in string | number]: unknown },
+    K extends keyof R,
+    V extends R[K]
+  >(obj: R): ObjectLikeMap<R, K, V>;
+  // export function Map<V>(obj: { [key: string]: V }): Map<string, V>;
+
+  export interface ObjectLikeMap<R extends {[key in string|number]: unknown}, K extends keyof R, V extends R[K]> extends Map<K, V> {
+    get(index: K, notSetValue: never): R[K];
+    get(index: K): R[K];
+  }
 
   export interface Map<K, V> extends Collection.Keyed<K, V> {
     /**
