@@ -283,4 +283,30 @@ describe('merge', () => {
     const Sizable = Record({ size: 0 });
     expect(Sizable().merge({ size: 123 }).size).toBe(123);
   });
+
+  const incompatibleMerges = [
+    ['Map', 'List', Map({ foo: 'bar' }), List(['bar'])],
+    ['Map', 'array', Map({ foo: 'bar' }), ['bar']],
+    ['object', 'List', { foo: 'bar' }, List(['bar'])],
+    ['object', 'array', { foo: 'bar' }, ['bar']],
+  ];
+
+  incompatibleMerges.forEach(
+    ([firstName, secondName, firstValue, secondValue]) => {
+      it(`returns first value or throws Error when called with ${firstName} and ${secondName}`, () => {
+        try {
+          expect(merge(firstValue, secondValue)).toBe(firstValue);
+        } catch {
+          // Throwing an Error is also acceptable in these cases
+        }
+      });
+      it(`returns first value or throws Error when called with ${secondName} and ${firstName}`, () => {
+        try {
+          expect(merge(secondValue, firstValue)).toBe(secondValue);
+        } catch {
+          // Throwing an Error is also acceptable in these cases
+        }
+      });
+    }
+  );
 });
