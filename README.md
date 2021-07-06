@@ -1,15 +1,12 @@
 # Immutable collections for JavaScript: Community Maintained Edition
 
-This is a fork of Immutable-JS intended to serve has home to active development
-during the period (February 2019 - ???) when Immutable.js has no active
-maintainers. If all goes well this repository will be deprecated and merged
-back into the main immutable repository as soon as that repository has active
-maintainers.
+This is a fork of Immutable-JS that served as home to active development
+during the period (February 2019 - June 2021) when Immutable.js had no active
+maintainers. It was never released as its own package, and all work done in
+this repository has since been ported back to the [immutable.js repo](https://github.com/immutable-js/immutable-js).
 
-The present scope of this fork is limited to the bug fixes and polish necessary to
+The scope of this fork is limited to the bug fixes and polish necessary to
 make the long-awaited `immutable@4.0` release.
-
-This repo will be released under the npm package name `immutable-oss`.
 
 [![Build Status](https://travis-ci.com/immutable-js-oss/immutable-js.svg?branch=master)](https://travis-ci.com/immutable-js-oss/immutable-js) [![Join the chat at https://gitter.im/immutable-js/Lobby](https://badges.gitter.im/immutable-js/Lobby.svg)](https://gitter.im/immutable-js/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
